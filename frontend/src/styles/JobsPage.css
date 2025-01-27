@@ -1,0 +1,34 @@
+/* Jobs container */
+.jobs-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* Header styling */
+  .jobs-container h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  /* Flexbox layout for job cards */
+  .jobs-list {
+    display: flex;
+    flex-wrap: wrap; /* Allow cards to wrap to the next row */
+    gap: 20px; /* Spacing between cards */
+    justify-content: center; /* Center the cards */
+  }
+  
+
+  @media (max-width: 768px) {
+    .jobs-list {
+      flex-direction: column;
+      gap: 15px;
+    }
+  }
+
+  
+
+  
