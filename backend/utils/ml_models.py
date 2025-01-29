@@ -12,9 +12,7 @@ except FileNotFoundError as e:
     print("Error loading TF-IDF model:", e)
 #     tfidf_vectorizer = None
 
-from sklearn.metrics.pairwise import cosine_similarity
-
-def get_top_recommendations(seeker_id: int, db: Session, top_n: int = 4):
+def get_top_recommendations(seeker_id: int, db: Session, top_n: int = 6):
     # Fetch seeker data
     seeker = db.query(JobSeeker).filter(JobSeeker.seeker_id == seeker_id).first()
     if not seeker:
@@ -40,7 +38,7 @@ def get_top_recommendations(seeker_id: int, db: Session, top_n: int = 4):
     return recommended_jobs
 
 
-def get_top_recommendations_from_data(seeker_data: dict, db: Session, top_n: int = 3):
+def get_top_recommendations_from_data(seeker_data: dict, db: Session, top_n: int = 6):
     seeker_profile = f"{seeker_data['skills']} {seeker_data['interests']} {seeker_data['previous_jobs']} {seeker_data['looking_jobs']}"
     seeker_vector = tfidf_vectorizer.transform([seeker_profile])
     jobs = db.query(Job).all()

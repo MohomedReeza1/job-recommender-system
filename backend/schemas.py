@@ -69,3 +69,21 @@ class JobSeekerResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+# Recommendation schema
+class RecommendationRequest(BaseModel):
+    name: str
+    age: int
+    gender: str
+    height: float
+    weight: float
+    marital_status: str
+    num_of_children: int
+    education: str
+    skills: str
+    interests: str
+    previous_jobs: str
+    looking_jobs: str
+    description: str
+    passport_status: str

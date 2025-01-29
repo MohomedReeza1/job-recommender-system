@@ -36,6 +36,16 @@ class JobSeeker(Base):
     description = Column(Text)
     passport_status = Column(String(20))
 
+class AppliedJob(Base):
+    __tablename__ = "applied_jobs"
+    id = Column(Integer, primary_key=True, index=True)
+    seeker_id = Column(Integer, ForeignKey("job_seekers.seeker_id"))
+    job_id = Column(Integer, ForeignKey("job_list.job_id"))
+
+    job = relationship("Job")
+    seeker = relationship("JobSeeker")
+
+
 # class UserJobInteraction(Base):
 #     __tablename__ = "user_job_interactions"
 #     interaction_id = Column(Integer, primary_key=True, index=True)
