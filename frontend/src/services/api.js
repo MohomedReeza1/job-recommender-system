@@ -20,7 +20,6 @@ export const fetchJobs = async () => {
   }
 };
 
-
 // Example: Get recommendations
 export const fetchRecommendations = async (userId) => {
   try {
@@ -32,7 +31,6 @@ export const fetchRecommendations = async (userId) => {
   }
 };
 
-
 export const fetchRecommendationsWithForm = async (formData) => {
   try {
     const response = await api.post("/recommendations/", formData);
@@ -42,4 +40,3 @@ export const fetchRecommendationsWithForm = async (formData) => {
     throw error;
   }
 };
-

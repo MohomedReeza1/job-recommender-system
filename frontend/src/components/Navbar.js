@@ -6,7 +6,7 @@ import '../styles/Navbar.css';
 const Navbar = () => {
   return (
     <nav className="navbar">
-      <h1>Job Recommender</h1>
+      <h1><Link to="/" className="globalhire">GlobalHire</Link></h1>
       <ul>
         <li>
           <Link to="/">Home</Link>

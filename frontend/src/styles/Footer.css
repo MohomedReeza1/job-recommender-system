@@ -1,0 +1,50 @@
+.footer {
+    background: #111;
+    color: white;
+    padding: 5px;
+  }
+  
+  .footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  
+  .footer-logo,
+  .footer-links,
+  .footer-contact,
+  .footer-newsletter {
+    flex: 1;
+    padding: 10px;
+  }
+  
+  .footer-links ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .footer-links li {
+    margin-bottom: 5px;
+  }
+  
+  .footer-links ul li a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .footer-newsletter input {
+    padding: 10px;
+    width: 70%;
+  }
+  
+  .footer-newsletter button {
+    padding: 10px;
+    background: #ff5733;
+    color: white;
+  }
+  
+  .footer-bottom {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+  }

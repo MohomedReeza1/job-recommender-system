@@ -1,0 +1,162 @@
+body {
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+.home-container {
+  text-align: center;
+  color: #333;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.hero-section {
+  position: relative;
+  text-align: center;
+  width: 100%;
+}
+
+.hero-image {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+}
+
+.how-it-works {
+  background: #ffffff;
+  padding: 60px 20px;
+}
+
+.steps-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.step {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  flex: 1;
+}
+
+.step span {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.featured-categories {
+  background: #007bff;
+  padding: 50px 20px;
+  color: white;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  justify-content: center;
+  text-align: center;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.category img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; 
+}
+
+.category h4 {
+  margin-top: 10px;
+  font-size: 1.2rem;
+}
+
+.category p {
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.why-choose-us {
+  background: linear-gradient(135deg, #ff5733, #ff9800);
+  color: white;
+  padding: 60px;
+}
+
+.why-choose-us h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.why-choose-us ul {
+  list-style: none;
+  padding: 0;
+  font-size: 1.2rem;
+}
+
+.why-choose-us li {
+  margin-bottom: 10px;
+}
+
+.recent-jobs {
+  background: white;
+  padding: 50px 20px;
+}
+
+.view-more-btn {
+  background: #007bff;
+  padding: 10px 15px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.view-more-btn:hover {
+  background: #0056b3;
+}
+
+.job-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  justify-content: center;
+}
+
+.cta-section {
+  background: #007bff;
+  color: white;
+  padding: 50px;
+}
+
+.cta-button {
+  padding: 12px 25px;
+  background-color: white;
+  color: #007bff;
+  border: none;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cta-button:hover {
+  background: #e2e2e2;
+}

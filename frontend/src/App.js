@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import JobsPage from "./pages/JobsPage";
 import RecommendationsPage from "./pages/RecommendationsPage";
 import ApplyJobPage from "./pages/ApplyJobPage";
+import Footer from "./components/Footer";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/recommendations" element={<RecommendationsPage />} />
         <Route path="/apply-job/:jobId" element={<ApplyJobPage />} />
       </Routes>
+      <Footer />
     </Router>
   );
 };
