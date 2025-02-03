@@ -1,0 +1,1743 @@
+C:\final_year_project
+├── updated_job_matching_platform_dataset.xlsx
+├── ml_model.ipynb          # Jupyter notebook or Colab script for your ML model
+├── app                    # Folder for your React/FastAPI application
+│   ├── backend            # Backend code (FastAPI)
+│   └── frontend           # Frontend code (React)
+└── README.md  
+
+
+
+I want you to act as a software developer. I will provide some specific information about a web app requirements, and it will be your job to come up with an architecture for developing an job recommendation app integrated with a machine learning. the goal of the app is users to get recommendation on jobs that suits them. the features of the app will include viewing all jobs from a database, get recommendations for suitable jobs according to his/her input data, apply for the job, view applied jobs! 
+I need to use React, PostgreSQL and FastAPI as the tools and I'm using VS code. Also I need to train the ML model in google collab.
+
+
+I need to develop a web app for below requirements,
+1. I need to train a high accuracy machine learning model from an excel file which contains some user details and job details that recommends job vacancies posted by agencies when a customer enters his/her personal data.
+
+2. A customer should be able to fill in the personal data in the UI(like in a form) then below their should be a button named "Get job recommendations" and when the customer fills in data and clicked this button, all the relevant job vacancies should be listed (from the job posts that are trained in the ML model).
+
+3. Additionally their should be a "view all jobs" button, and when clicked this button i need to show the all jobs from the postgreSQL database that consist all the job posts.
+
+
+(My supervisor said to use FastAPI as it will be good)
+
+I need proper beginner level guidance with the code for all the steps (Set up the Environment, Build the FastAPI Backend, Build the Frontend).
+
+
+
+(Name,Age,Gender,Height,Weight,Marital Status,Number of Children,Education,Skills,Interests,Previous Jobs,Looking Jobs,Description,Passport Status). 
+
+Job ID, Job Title, Country, Job Description, Skills Required, Experience Required, Age Required, Salary, Working Hour, Facilities, Looking gender, No. of job seekers required,Available Quantity
+
+
+
+git remote add origin https://github.com/MohomedReeza1/JobRecommendationSystem.git
+
+https://github.com/MohomedReeza1/JobRecommendationSystem
+
+
+
+now i need to Save the model, Test the model on test data,
+
+
+
+
+Step 1: Setting Up Your Data
+1. Structure Your Data
+2. Clean Your Data
+3. Data Splitting
+
+Step 2: Training the Model
+1. Define Inputs and Outputs
+2. Configure Model Settings
+3. Train the Model
+
+Step 3: Testing and Evaluating the Model
+1. Apply the Model to Testing Data
+2. Evaluate Accuracy
+
+Step 4: Making Predictions with New Data
+1. Enter New Data
+2. Generate Predictions
+
+are these the steps of creating a machine learning model
+
+
+
+
+-------------------------------------BACKEND-------------------------------------------
+
+
+C:\final_year_project\app\backend
+│
+├── main.py                # Entry point for the FastAPI app
+├── database.py            # Database connection setup
+├── models.py              # SQLAlchemy database models
+├── schemas.py             # Pydantic models for API requests/responses
+├── crud.py                # Functions for database operations
+├── routers                # Folder for API routes
+│   ├── __init__.py        # Make it a Python package
+│   ├── jobs.py            # Routes related to jobs
+│   ├── seekers.py         # Routes related to job seekers
+│   ├── recommendations.py # Routes for recommendations
+│
+├── utils                  # Folder for utilities (ML models, helpers, etc.)
+│   ├── __init__.py        # Make it a Python package
+│   ├── ml_models.py       # ML model loading and prediction logic
+│
+└── requirements.txt       # Dependencies list
+
+
+
+test api
+{
+  "name": "reez",
+  "age": 30,
+  "gender": "male",
+  "height": 170,
+  "weight": 75,
+  "marital_status": "single",
+  "num_of_children": 0,
+  "education": "AL",
+  "skills": "Driving",
+  "interests": "Safety, Driving",
+  "previous_jobs": "",
+  "looking_jobs": "Driver",
+  "description": "description",
+  "passport_status": "valid"
+}
+
+
+---------------------------------------------------------------------------------------
+
+//main.py
+
+from fastapi import FastAPI
+from database import Base, engine
+from routers import jobs, seekers, recommendations
+
+# Initialize database
+Base.metadata.create_all(bind=engine)
+
+# Initialize app
+app = FastAPI()
+
+# Include routers
+app.include_router(jobs.router, prefix="/api", tags=["Jobs"])
+app.include_router(seekers.router, prefix="/api", tags=["Job Seekers"])
+app.include_router(recommendations.router, prefix="/api", tags=["Recommendations"])
+
+
+//database.py
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+DATABASE_URL = "postgresql://postgres:test1234@localhost/JobRecommendationSystem"
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# Dependency for getting the database session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+//models.py
+
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float
+from sqlalchemy.orm import relationship
+from database import Base
+
+class Job(Base):
+    __tablename__ = "job_list"
+    job_id = Column(Integer, primary_key=True, index=True)
+    job_title = Column(String(50), nullable=False)
+    country = Column(String(50), nullable=False)
+    job_description = Column(Text, nullable=False)
+    skills_required = Column(Text, nullable=False)
+    experience_required = Column(String(30), nullable=False)
+    age_required = Column(String(10))
+    salary = Column(String(20))
+    working_hours = Column(String(20))
+    facilities = Column(Text)
+    looking_gender = Column(String(20))
+    num_of_job_seekers_required = Column(Integer)
+    available_quantity = Column(Integer)
+
+class JobSeeker(Base):
+    __tablename__ = "job_seekers"
+    seeker_id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100))
+    age = Column(Integer)
+    gender = Column(String(10))
+    height = Column(Float)
+    weight = Column(Float)
+    marital_status = Column(String(20))
+    num_of_children = Column(Integer)
+    education = Column(Text)
+    skills = Column(Text)
+    interests = Column(Text)
+    previous_jobs = Column(Text)
+    looking_jobs = Column(Text)
+    description = Column(Text)
+    passport_status = Column(String(20))
+
+# class UserJobInteraction(Base):
+#     __tablename__ = "user_job_interactions"
+#     interaction_id = Column(Integer, primary_key=True, index=True)
+#     seeker_id = Column(Integer, ForeignKey("job_seekers.seeker_id"))
+#     job_id = Column(Integer, ForeignKey("job_list.job_id"))
+#     interaction_type = Column(String(20))
+#     interaction_value = Column(Float)
+
+
+//ml_models.py
+
+import pickle
+from sklearn.metrics.pairwise import cosine_similarity
+from sqlalchemy.orm import Session
+from models import JobSeeker, Job 
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+
+# Load pre-trained ML models
+try:
+    tfidf_vectorizer = pickle.load(open("ml_model/tfidf_vectorizer.pkl", "rb"))
+except FileNotFoundError as e:
+    print("Error loading TF-IDF model:", e)
+#     tfidf_vectorizer = None
+
+from sklearn.metrics.pairwise import cosine_similarity
+
+def get_top_recommendations(seeker_id: int, db: Session, top_n: int = 3):
+    # Fetch seeker data
+    seeker = db.query(JobSeeker).filter(JobSeeker.seeker_id == seeker_id).first()
+    if not seeker:
+        return []
+
+    # Combine seeker profile data for vectorization
+    seeker_profile = f"{seeker.skills} {seeker.interests} {seeker.previous_jobs} {seeker.looking_jobs}"
+    seeker_vector = tfidf_vectorizer.transform([seeker_profile])
+
+    # Vectorize all job descriptions
+    jobs = db.query(Job).all()
+    job_descriptions = [job.job_description for job in jobs]
+    job_vectors = tfidf_vectorizer.transform(job_descriptions)
+
+    # Calculate similarity scores
+    similarity_scores = cosine_similarity(seeker_vector, job_vectors)
+
+    # Get top N job indices
+    top_indices = similarity_scores[0].argsort()[::-1][:top_n]
+
+    # Fetch corresponding jobs from the database
+    recommended_jobs = [jobs[i] for i in top_indices]
+    return recommended_jobs
+
+
+//schemas.py
+
+from pydantic import BaseModel
+from typing import Optional
+
+# Job schema
+class JobCreate(BaseModel):
+    job_title: str
+    country: str
+    job_description: str
+    skills_required: str
+    experience_required: str
+    age_required: Optional[str]
+    salary: Optional[str]
+    working_hours: Optional[str]
+    facilities: Optional[str]
+    looking_gender: Optional[str]
+    num_of_job_seekers_required: Optional[int]
+    available_quantity: Optional[int]
+
+class JobResponse(BaseModel):
+    job_id: int
+    job_title: str
+    country: str
+    job_description: str
+    skills_required: str
+    experience_required: str
+    age_required: Optional[str]
+    salary: Optional[str]
+    working_hours: Optional[str]
+    facilities: Optional[str]
+    looking_gender: Optional[str]
+    num_of_job_seekers_required: Optional[int]
+    available_quantity: Optional[int]
+
+    class Config:
+        orm_mode = True
+
+# Job seeker schema
+class JobSeekerCreate(BaseModel):
+    name: str
+    age: int
+    gender: str
+    height: float
+    weight: float
+    marital_status: str
+    num_of_children: int
+    education: str
+    skills: str
+    interests: str
+    previous_jobs: str
+    looking_jobs: str
+    description: str
+    passport_status: str
+
+class JobSeekerResponse(BaseModel):
+    name: str
+    age: int
+    gender: str
+    height: float
+    weight: float
+    marital_status: str
+    num_of_children: int
+    education: str
+    skills: str
+    interests: str
+    previous_jobs: str
+    looking_jobs: str
+    description: str
+    passport_status: str
+
+    class Config:
+        orm_mode = True
+
+
+//jobs.py
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from database import get_db
+from models import Job
+
+router = APIRouter()
+
+@router.get("/jobs/")
+def get_jobs(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    jobs = db.query(Job).offset(skip).limit(limit).all()
+    return jobs
+
+
+//recommendations.py
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from database import get_db
+from models import JobSeeker
+from utils.ml_models import get_top_recommendations
+from schemas import JobResponse
+
+router = APIRouter()
+
+@router.get("/recommendations/{seeker_id}", response_model=list[JobResponse])
+def recommend_jobs(seeker_id: int, db: Session = Depends(get_db)):
+    recommended_jobs = get_top_recommendations(seeker_id, db, top_n=3)
+    if not recommended_jobs:
+        raise HTTPException(status_code=404, detail="No recommendations found for this job seeker.")
+    return recommended_jobs
+
+
+//seekers.py
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from database import get_db
+from models import JobSeeker
+from schemas import JobSeekerCreate, JobSeekerResponse
+
+router = APIRouter()
+
+@router.post("/seekers/", response_model=JobSeekerResponse)
+def create_job_seeker(seeker: JobSeekerCreate, db: Session = Depends(get_db)):
+    # Convert Pydantic model to SQLAlchemy model
+    new_seeker = JobSeeker(**seeker.dict())
+    db.add(new_seeker)
+    db.commit()
+    db.refresh(new_seeker)
+    return new_seeker
+
+
+
+
+
+
+---------------------------FRONTEND----------------------------------------------------
+
+
+
+APPLY JOBS - QUESTIONS
+
+I need to show the apply_job page so that if a user clicks "apply now" from "Jobs" page, i need to have a form to enter user details in the applying page (Name,Age,Gender,Height,Weight,Marital Status,Number of Children,Education,Skills,Interests,Previous Jobs,Looking Jobs,Description,Passport Status) and click confirm apply. (I need to save this user data into the database as well)
+
+And if a user clicks "apply now" from the recommended jobs "Recommendation" page (after getting recommendations), no need to have a form to enter user details again (as the user already entered the details in the form and got recommendations), just click confirm apply.
+
+A user can apply for one or more jobs as he/she browse through my web-app. And i need to store these applied jobs in the database (applied_jobs table) and show all these applied jobs in the "/applied-jobs" page for the user.
+
+Are there any issues related to this requirement (do we need to implement a session for this? or do we need to implement signup/login or login as a guest or anything like this) or we can implement this requirement?
+
+
+
+----------------------------------------GIT--------------------------------------------
+
+cd C:\final_year_project\app   # Navigate to project folder
+git status                 # Check for uncommitted changes
+git add .                  # Stage any changes (if needed)
+git commit -m "Saving local changes"  # Commit changes
+git pull origin main       # Fetch the latest version from GitHub
+
+
+cd C:\final_year_project\app
+git status
+git add .
+git commit -m "create the expanded dataset"
+git pull origin main
+
+git push origin main
+
+---------------------------EXCEL DUMMY DATA CREATION-----------------------------------
+
+Criteria for Generating Dummy Data
+
+1. General Information
+Dataset Purpose: Improve job recommendations ML model with a high accuracy using content-based filtering & collaborative filtering.
+
+2. Job Seeker Data
+Name: Random Sri Lankan Names
+Age Range: 21-60
+Gender Distribution: 60% Male, 40% Female
+Education Levels: No Formal Education(5%), O/L(45%), A/L(40%), Diploma(5%), Degree(5%)
+Skills Distribution: I need you to carefully research and include each minimum of 3 skills relevant for the above given job titles and his/her looking job/previous job.
+Interests Distribution: I need you to carefully research and include each minimum of 2 skills interests that is relevant for the above given skills and his/her looking job/previous job.
+Previous Job Titles: A person may or may not have a Previous Job. A person can have multiple Previous Jobs. If a person having a previous job they have certain skills related to this job.
+Looking for Job Titles: Assume 90% of the Job seeker may have a Looking Job. A person can have multiple looking Jobs. If a person looking for a job, they might have skills, skills or / & interests related to this job.
+Description: A well explained description about themselves including the skills, interests and experiences. 
+Experience Levels (Years): 0-10 years, with distribution
+Passport Status Distribution: 70% Valid, 20% Applied, 10% Expired
+Other Factors (Marital Status, Height, Weight, Number of Children): Just random normal values
+
+Skills column cannot be empty.
+
+3. Job Listings Data
+Job Titles: 
+AC technicains (Auto/Domestic)
+Agriculture Workers
+Aluminum Fabricator
+Auto Denter
+Auto Mechanics (Vehicle/Machinery)
+Auto Painter
+Auto Technician Level 2
+Auto Technician Level 3
+Baby Sitter
+Barista
+Bartender
+Beautician
+Beautician (Hair Dressers/Manicure/Pedicure)
+Butcher
+Cake Decorators
+Car Washer
+Care Giver
+Carpenter
+Cash Custodian
+Cashiers
+CCTV Technicians
+Chef
+Chef De Partie
+Civil Helper
+Cleaner
+Cleaners - Sand Blasters
+Cleaning Girls (Hotel)
+Commis Chef
+Computer operators / Programmers
+Construction Helpers
+Crane Operator
+Customer Service Officer
+Delivery Rider
+Demi Chef De Partie
+Dishwasher
+Driver
+Driver (Agriculture/Land)
+Driver (Heavy Vehicle - Truck)
+Driver (Light Vehicle - Domestic/Taxi)
+Electrician
+Electrician (Auto)
+Electrician (Domestic)
+Electrician (Industrial)
+Excavator & Loader Operators
+Flower Decorators (Flower Shops)
+Gardener
+General Cleaner
+General Factory Workers
+General Helper
+Head Waiter
+Helper
+Host
+House Boy
+House Cook
+House Driver
+House Keeper (Hotel)
+House Maid
+House Nurse
+Housekeeper
+Housekeeping Assistant
+Industrial Painter
+Juki Machine Operators
+Juki Machine Technicians
+Kitchen Helper
+Kitchen Steward
+Locksmiths
+Machine Operators (Industrial)
+Machinery Mechanics
+Manager (Hotel/Restaurant)
+Mason
+Masons
+Master Technician
+Mechanical Helper
+Multi Technician
+Nurse
+Nurse- Adult
+Nurse- Adult/Pediatric
+Nurse- Pediatric
+Office Assistants
+Offset/Digital Printing Machine Operator
+Packers
+Painters
+Pastry & Bakery Chef
+Pickers (Fruits/Vegetables)
+Pizza Makers
+Plumbers
+Polisher
+PPF Technician
+Production Labor
+Runner
+Saw Mill Machine operator
+Sawing Machine Operators (JUKI)
+Scaffolder
+Security Guard
+Sous Chef
+SPA Therapist
+Supervisor
+Sushi Chefs
+Tailor
+Tile Mason
+Trainer
+Veterinary Assistants
+Waiter
+Waitress
+Warehouse Asssistants
+Warehouse Workers
+Welder (Arc/Mig/Tig/Tag/Gas)
+Worker
+
+
+Countries: Bahrain, Jordan, Kuwait(high frequency), Lebanon, Oman, Qatar(high frequency), Saudi Arabia(high frequency), United Arab Emirates(high frequency), Romania(high frequency), Singapore, Malaysia
+Description: A well explained description about the job. 
+Skills Required for Each Job: I need you to carefully research and include each minimum of 3 skills relevant for the above given job titles. (I want you to include these skills in Job Seeker's Skills also & suitable Interests accordingly.)
+Experience Required - whether experience required or 1st time person are allowed. 
+Salary Range: Rs. 150,000.00 - Rs. 300,000.00
+Age Requirement for Jobs: 20-60
+Work Hours: distribute between 8-12 hours 
+gender: gender classification between jobs
+No. of job seekers required & Available Quantity : just random numbers.
+Facilities Provided: distribute between Accommodation, Food, Medical / Accommodation, Medical/ Accommodation, Food, Transport/ Accommodation, Medical, Meal Allowance/ Accommodation, Medical, Transport/ Accommodation, Medical, Transport, Meal Allowance/ Accommodation, Food, Medical, Utilities.
+
+Skills column cannot be empty.
+
+4. User-Job Interaction Data
+Types of Interactions Needed:
+✅ Job Applied (Specify distribution): Applied job means it is the most successful or most suitable job for a person
+✅ Job Clicked/View (Specify frequency): A person can view or click multiple jobs from his/her preference base on his/her skills/interests.
+✅ Job Saved/Shortlisted (Specify percentage): No need for Saved/Shortlisted jobs.
+✅ Job Ignored (Specify percentage): This is possible. Not every person looking for every job. A person is mostly looking for the relevant jobs based on his/her skills/interests.
+Interaction Value Ranges: Application rate: 5%, Click rate: 15%, View rate: 30%, , ignore rate: 50%)
+
+5. Special Considerations
+Do you need additional features (e.g., language skills, agency preferences)? No
+Do you want some missing/incomplete data for realism? (e.g., 5% missing values) Yes
+Do you need data biases to reflect real-world trends? (e.g., certain jobs preferred by males/females) Yes, Also analyze that some jobs are mostly for females (like House Maid, House Nurse, Nurse, Baby Sitter). and some jobs are mostly for males (like Driver,House Driver, House Boy, Warehouse Asssistants, Supervisor, Head Waiter). And also there are some jobs that are required both males and females (like Waiter, Housekeeper, Cleaner, Worker, House Keeper). Therefore distribution these suitably.
+
+
+For your reference to take an idea from a real dataset that consisting these 109 job titles -> what gender each job title have,which country this job is mostly having and which jobs have the most demands i will attach an excel file.
+
+Please carefully create me this dataset with the information provided and using the job_list excel that contains a real dataset of jobs.
+
+
+I need the carefully prepared output in one excel file with three sheets.
+
+
+user_data – 300–500 users with diverse profiles.
+job_data – 100+ job listings enriched with relevant skills, descriptions, and required qualifications.
+interaction_data – 2,000–5,000 interactions (views, clicks, applications, and ignores) following your specified distribution.
+
+---------------------------------------------------------------------------------------
+
+Job Listings Dataset
+
+I need you to create a dataset about 200+ job listings enriched with relevant skills, descriptions for a job list including the following as the columns. 
+
+Job ID,Job Title,Country,Job Description,Skills Required,Experience Required,Age Required,Salary,Working Hours,Facilities,Looking gender,No. of job seekers required,Available Quantity
+
+I'll include an example for each column.
+
+1. Job ID - This should contain primary numbers starting from 1. 
+
+2. Job Title -
+
+Here is 100 job titles: 
+AC technicains (Auto/Domestic)
+Agriculture Workers
+Aluminum Fabricator
+Auto Denter
+Auto Mechanics (Vehicle/Machinery)
+Auto Painter
+Auto Technician Level 2
+Auto Technician Level 3
+Baby Sitter
+Barista
+Bartender
+Beautician
+Beautician (Hair Dressers/Manicure/Pedicure)
+Butcher
+Cake Decorators
+Car Washer
+Care Giver
+Carpenter
+Cash Custodian
+Cashiers
+CCTV Technicians
+Chef
+Chef De Partie
+Civil Helper
+Cleaner
+Cleaning Girls (Hotel)
+Commis Chef
+Computer operators / Programmers
+Construction Helpers
+Crane Operator
+Customer Service Officer
+Delivery Rider
+Demi Chef De Partie
+Dishwasher
+Driver
+Driver (Agriculture/Land)
+Driver (Heavy Vehicle - Truck)
+Driver (Light Vehicle - Domestic/Taxi)
+Electrician
+Electrician (Auto)
+Electrician (Domestic)
+Electrician (Industrial)
+Excavator & Loader Operator
+Flower Decorator (Flower Shops)
+Gardener
+General Cleaner
+General Factory Worker
+General Helper
+Head Waiter
+Helper
+House Boy
+House Cook
+House Driver
+House Keeper (Hotel)
+House Maid
+House Nurse
+Housekeeper
+Housekeeping Assistant
+Industrial Painter
+Juki Machine Operator
+Juki Machine Technician
+Kitchen Helper
+Kitchen Steward
+Machine Operator (Industrial)
+Manager (Hotel/Restaurant)
+Mason
+Master Technician
+Mechanical Helper
+Multi Technician
+Nurse
+Nurse- Adult
+Nurse- Adult/Pediatric
+Nurse- Pediatric
+Office Assistant
+Offset/Digital Printing Machine Operator
+Painter
+Pastry & Bakery Chef
+Picker (Fruits/Vegetables)
+Pizza Maker
+Plumber
+Polisher
+PPF Technician
+Production Labor
+Saw Mill Machine operator
+Sawing Machine Operator (JUKI)
+Scaffolder
+Security Guard
+Sous Chef
+Supervisor
+Sushi Chef
+Tailor
+Tile Mason
+Trainer
+Veterinary Assistant
+Waiter
+Waitress
+Warehouse Assistant
+Warehouse Worker
+Welder (Arc/Mig/Tig/Tag/Gas)
+Worker
+
+I want you to create for each of this job title include two job postings each job from two countries.
+
+ex: 
+1 Waiter Oman
+2 Waiter Saudi Arabia
+
+
+3. Country - Countries: Bahrain, Jordan, Kuwait(high frequency), Lebanon, Oman, Qatar(high frequency), Saudi Arabia(high frequency), Dubai(high frequency), Romania(high frequency), Singapore, Malaysia
+
+4. Job Description - A well explained description about the job.
+
+5. Skills Required - I need you to carefully research and include each minimum of 3 skills that is actual and relevant for the above given job titles. 
+
+6. Experience Required - distribute whether experienced or 1st time or both 1st time, Experienced
+
+7. Age Required - distribute between subsets of 21-60
+
+8. Salary - distribute between Rs. 150000.00 to Rs. 300000.00
+
+9. Working Hours - distribute between 8-12 hours 
+
+10. Facilities - distribute between Accommodation, Food, Medical / Accommodation, Medical/ Accommodation, Food, Transport/ Accommodation, Medical, Meal Allowance/ Accommodation, Medical, Transport/ Accommodation, Medical, Transport, Meal Allowance/ Accommodation, Food, Medical, Utilities.
+
+11. Looking gender - gender classification between jobs
+
+
+12. No. of job seekers required - distribute between 5 - 200
+
+
+13. Available Quantity - Available Quantity is random number that is less than the each  No. of job seekers required
+
+Special Considerations : 
+Do you want some missing/incomplete data for realism? No
+
+Do you need data biases to reflect real-world trends? (certain jobs preferred by males/females) Yes, Also analyze that some jobs are mostly for females (like House Maid, House Nurse, Nurse, Baby Sitter). and some jobs are mostly for males (like Driver, House Driver, House Boy, Warehouse Assistants, Supervisor, Head Waiter). And also there are some jobs that are required both males and females (like Waiter, Housekeeper, Cleaner, Worker, House Keeper). Therefore distribution these suitably.
+
+
+Two example rows:
+1 
+Waiter 
+Oman 
+This is a job for a waiter in Oman. As a waiter, you'll be the face of our restaurant, ensuring that every guest has an unforgettable dining experience. Your responsibilities will include greeting and seating customers, taking accurate food and drink orders, and delivering them promptly with a friendly attitude. You'll also be expected to maintain a thorough knowledge of our menu, offer recommendations, and manage any special requests or dietary restrictions with professionalism. Additionally, you’ll handle payments, keep tables clean, and ensure that all guests leave satisfied and eager to return. Strong communication skills, a positive demeanor, and the ability to work in a fast-paced environment are essential. 
+Communication skills, Customer service, Time management
+Experienced
+30-50
+Rs. 248223.00
+10 hours
+Accommodation, Food, Medical
+male, female
+95
+47
+
+2 
+Waiter 
+Saudi Arabia 
+This is a job for a waiter in Saudi Arabia. We are looking for an enthusiastic waiter to join our team in providing top-notch service to our patrons. In this role, you will be responsible for taking orders, serving food and beverages, and ensuring that customers have an enjoyable experience from the moment they enter until they leave. You should be able to work efficiently under pressure, handle multiple tables simultaneously, and communicate effectively with kitchen staff to ensure orders are accurate and timely. A friendly and approachable manner is a must, along with the ability to handle customer inquiries and resolve any issues with grace and efficiency.
+Communication skills, Knowledge of food and beverages, Teamwork
+1st time, Experienced
+21-37
+Rs. 150120.00
+9 hours
+Accommodation, Medical, Transport, Meal Allowance
+male
+10 
+5
+
+
+
+--------------------------------------------------------------------------------------
+
+1. Skills Relevance:
+
+Should the skills for each job be researched based on industry standards, or do you have a specific reference or job descriptions you’d like me to use? I don't have any references for job descriptions or skills. researched based on industry standard will be best.
+Should the skills be formatted as a comma-separated string? yes.
+
+2. Salary Currency & Conversion:
+
+You mentioned salaries in "Rs." – should this be in Sri Lankan Rupees (LKR) or another currency? yes, this is in Sri Lankan Rupees.
+If using Sri Lankan Rupees, should I convert from the typical salaries paid in these countries? No need, Just use random salary distribution between 150000 to 300000.
+
+3. Age & Experience Distribution:
+
+Should I use a uniform random distribution for age and experience, or do you want some jobs (e.g., skilled roles) to lean towards experienced workers while others (e.g., helpers) allow first-time applicants? skilled roles to lean towards experienced workers while others allow first-time applicants will be better.
+
+4. Gender Distribution:
+
+I will follow the gender preferences you outlined, but should I ensure a strict adherence (e.g., no male Housemaids) or allow minor variance? yes jobs like House Maid, House Nurse, Baby Sitter are only for females and hard jobs like House Boy, Technicians, Machine Operators, Industrial jobs are only for males. Jobs like Waiter, Housekeeper, Cleaner, Worker, House Keeper, general helper are common for both male and females. Therefore distribution these suitably.
+
+5. Country & Job Frequency:
+
+Should high-frequency countries (Kuwait, Qatar, Dubai, Romania) have more jobs than others, or should each country have an equal number? yes, these countries have more jobs.
+
+6. Dataset Format:
+
+Do you need this in Excel (.xlsx) format, CSV (.csv), or both?
+Do you require a SQL script to insert this data into a database?
+
+for now i need .xlsx format in order to train the ML model, later i need this to import into PostgreSQL
+
+----------------------------------------------------------------------------
+I want you to conduct industry-specific research for these job titles and insert suitable job related skills
+---------------------------------------------------------------------------------------
+
+Template 1
+This is a job for a waiter in Oman. As a waiter, you'll be the face of our restaurant, ensuring that every guest has an unforgettable dining experience. Your responsibilities will include greeting and seating customers, taking accurate food and drink orders, and delivering them promptly with a friendly attitude. You'll also be expected to maintain a thorough knowledge of our menu, offer recommendations, and manage any special requests or dietary restrictions with professionalism. Additionally, you’ll handle payments, keep tables clean, and ensure that all guests leave satisfied and eager to return. Strong communication skills, a positive demeanor, and the ability to work in a fast-paced environment are essential.
+
+
+This is a job for a [Job title] in [Country]. As a [Job title], you'll be the face of our restaurant, ensuring that every guest has an unforgettable dining experience. Your responsibilities will include greeting and seating customers, taking accurate food and drink orders, and delivering them promptly with a friendly attitude. You'll also be expected to maintain a thorough knowledge of our menu, offer recommendations, and manage any special requests or dietary restrictions with professionalism. Additionally, you’ll handle payments, keep tables clean, and ensure that all guests leave satisfied and eager to return. Strong communication skills, a positive demeanor, and the ability to work in a fast-paced environment are essential.
+
+Template 2
+This is a job for a [Job title] in [Country]. The role requires [Skill A], [Skill B], [Skill C] skills. Responsibilities include [Responsibilities].
+
+
+Template 3
+Perform tasks related to AC technicians (Auto/Domestic) responsibilities with industry standards.
+
+Final Template
+This is a job for a [Job Title] in [Country]. As a [Job Title], you will be responsible for [core responsibilities of the job], ensuring efficiency and quality in your role. Your key duties will include [task 1], [task 2], and [task 3], while maintaining high industry standards and workplace safety. You should have strong [mention key skills, e.g., communication, technical expertise, problem-solving] and the ability to work in a [mention work environment, e.g., fast-paced, physically demanding] setting. Prior experience in [mention relevant field] is preferred but not mandatory. If you are detail-oriented, hardworking, and looking for an opportunity to grow your career in [Country], this role is for you.
+
+---------------------------------------------------------------------------------------
+JOB CARD UI IDEA
+
+[Job Title] – [Country]
+About the Job:
+We are looking for a highly motivated [Job Title] to join our team in [Country]. This position offers an exciting opportunity to contribute to a dynamic work environment while utilizing your skills and expertise. As a [Job Title], you will play a crucial role in ensuring efficiency and quality within your respective industry.
+
+The ideal candidate should have a strong understanding of [mention specific industry, e.g., hospitality, construction, healthcare], demonstrate excellent [mention core skill, e.g., communication, technical ability, problem-solving], and be able to work efficiently in a fast-paced environment.
+
+Key Responsibilities:
+Perform [list primary job tasks], ensuring high-quality standards and efficiency.
+Maintain and operate [mention equipment, tools, or materials used] following safety regulations.
+Assist in [mention any secondary tasks, e.g., customer service, inventory, documentation].
+Work collaboratively with a team and report to [mention direct supervisor, e.g., manager, supervisor].
+Ensure compliance with [mention industry-specific safety and operational standards].
+Provide excellent [customer service, technical support, production assistance] based on job requirements.
+Skills & Qualifications Required:
+To be successful in this role, you should possess the following skills:
+✔ [Skill 1] – Describe how it applies to the role.
+✔ [Skill 2] – Explain its importance for job performance.
+✔ [Skill 3] – Highlight how it contributes to efficiency and effectiveness.
+
+Additional qualifications may include:
+
+Prior experience in [mention job field] (preferred but not mandatory).
+Ability to work in [mention work conditions, e.g., shifts, high-pressure environments].
+Knowledge of [mention any software, tools, or systems used].
+[Education or certification requirements].
+Job Benefits:
+We offer a range of benefits to our employees, including:
+✅ Competitive salary of [mention salary range].
+✅ Working hours: [mention hours per day] per day.
+✅ Accommodation, [mention other benefits like transportation, medical coverage] provided.
+✅ Growth opportunities and career advancement based on performance.
+
+Who Can Apply?
+This role is open to [mention target gender if applicable, e.g., Male, Female, Both] candidates aged [mention age range] with the right attitude, skills, and enthusiasm.
+
+If you are passionate about [mention job field, e.g., customer service, technical work, healthcare], eager to learn, and looking for a rewarding career opportunity in [Country], apply now!
+
+
+=========================Job Seeker dataset============================================
+
+
+Skills Distribution: I need you to carefully research and include each minimum of 3 skills relevant for the above given job titles and his/her looking job/previous job.
+
+Interests Distribution: I need you to carefully research and include each minimum of 2 skills interests that is relevant for the above given skills and his/her looking job/previous job.
+
+Previous Job Titles: A person may or may not have a Previous Job. A person can have multiple Previous Jobs. If a person having a previous job they have certain skills related to this job.
+
+Looking for Job Titles: Assume 90% of the Job seeker may have a Looking Job. A person can have multiple looking Jobs. If a person looking for a job, they might have skills, skills or / & interests related to this job.
+
+Description: A well explained description about themselves including the skills, interests and experiences. 
+
+Experience Levels (Years): 0-10 years, with distribution
+
+Passport Status Distribution: 70% Valid, 20% Applied, 10% Expired
+
+--------------------------------------------------------------------------------------
+Job Seeker Dataset creation
+
+I need you to create a dataset about 700–900 users with diverse profiles enriched with relevant Skills(critical), Interests(critical), Previous Jobs(critical), Looking Jobs(critical) and Description(critical) for the following columns. 
+
+User ID, Name, Age, Gender, Height, Weight, Marital Status, Number of Children, Education, Skills, Interests, Previous Jobs, Looking Jobs, Description, Passport Status
+
+1. User ID - This should contain primary numbers starting from 1.
+
+2. Name - Sri Lankan names (example: Nimal Jayawardena-Male, Manisha Gamage-female)
+
+3. Age - distribute between of 21-60
+
+4. Gender - distribute Male and female accordingly (60% Male, 40% Female)
+
+5. Height - Just random heights
+
+6. Weight - Just random weights
+
+7. Marital Status - consider the age and distribute between single or married accordingly.
+
+8. Number of Children - If single no children. If married, then may or may not have children (majority of the people below age 30, doesn't have children, maximum number of children per person is 2) - To make the dataset realistic.
+
+9. Education - No Formal Education(5%), O/L(45%), A/L(40%), Diploma(5%), Degree(5%)
+
+10. Skills - empty for now
+
+11. Interests - empty for now
+
+12. Previous Jobs - empty for now
+
+13. Looking Jobs - empty for now
+
+14. Description - empty for now
+
+15. Passport Status - 70% Valid, 20% Applied, 10% Invalid
+
+
+Special Considerations
+Do you want some missing/incomplete data for realism? (e.g., 5% missing values) Yes
+
+Do you need data biases to reflect real-world trends? (e.g., certain jobs preferred by males/females) Yes
+
+To ensure the format is okay i want you to only create 30 rows of data. If everythings okay we will continue to generate Skills, Interests, Previous Jobs, Looking Jobs, Description columns.
+
+example row:
+1
+Priya Fernando
+29
+Female
+160 cm
+55 kg
+Single
+0
+O/L
+-
+-
+-
+-
+-
+Valid
+
+
+user_data – 700–900 users with diverse profiles.
+job_data – 200 job listings enriched with relevant skills, descriptions, and required qualifications.
+interaction_data – 5,000–10,000 interactions (views, clicks, applications, and ignores) following your specified distribution.
+
+Template description-
+Experienced waitress with a knack for maintaining a clean and organized environment. Seeking roles in household management where my skills in multitasking and customer service can be utilized effectively.
+
+
+-------------------------------------------------------------------------------------
+
+//So for these critical columns i will provide some data in order to help you generating these data. 
+
+Find the updated job_list-interest-skills.xlsx file.
+job_seeker_sample_unique.xlsx this is the file you need to fill in Skills, Interests, Previous Jobs, Looking Jobs columns.
+
+job_list-interest-skills.xlsx this file contains a 100 different job titles, skills related to each job titles and interests related to each job titles and also a dataset of 200 different job posts with job details such as Job Description, Skills Required, Experience Required, Looking gender. This will make you life easier to generate for like 700-900 data.
+
+10. Skills - So skills must contain minimum of 2 skills related to either a user's Previous Job or Looking Job or both Previous Job and Looking Job.
+
+11. Interests - Interests must contain minimum of 2 interests related to either a user's Previous Job or Looking Job or both Previous Job and Looking Job.
+
+12. Previous Jobs - A user may or may not have a previous job. A user may have a multiple previous jobs. If this column has a job title, then skills and interests related to this job should be updated in the skills column and interests column.
+
+13. Looking Jobs - A user may or may not have a looking Job. A user may have a multiple looking jobs. If this column has a job title, then skills and interests related to this job should be updated in the skills column and interests column.
+
+14. Description - empty for now
+
+Special conditions - 
+1. A Looking Job should be based on the previous job. That means a user having experience on some job will looking for the same job. A user can have both multiple previous jobs and looking jobs. Also a user may not have both a previous job or a looking job (In this case, still a user can have interests and skills)
+2. The gender of the user should be dependent with the jobs that they are eligible. "job_list" sheet of job_list-interest-skills.xlsx contains the looking gender for every job posts (male or female or male, female both).
+3. If two jobs in the same job category have common Skills & interests, then previous jobs or/and looking jobs can contain those two jobs (for example, "Health Assessment" skill is common for both Nurse and House Nurse, so where the skill is Health Assessment their previous jobs or/and looking jobs can be Nurse or House Nurse). But an unrelated jobs cannot contain be together.
+4. It is okay to have unmatching looking jobs for a very few data. But later in a "interaction dataset" we need to show that we ignored (or didn't show interest) these jobs.
+
+Your concerns - 
+1. Skills & Interests
+Should Skills be occupation-related (e.g., "Carpentry, Plumbing") or include general skills (e.g., "Teamwork, Problem-solving")? I have given a list of skills and interests for each job title.
+
+Should Interests be more personal (e.g., "Sports, Traveling") or career-related (e.g., "Learning new machinery, Customer service")? I have given a list of skills and interests for each job title. Use those skills and interests.
+
+2. Previous Jobs & Looking Jobs
+Should Previous Jobs be more aligned with Looking Jobs or do we allow career shifts?Previous Jobs be more aligned with Looking Jobs will be more promising for creating a high accuracy ML model.
+
+Should we mix low-skilled, semi-skilled, and skilled jobs for variety? (e.g., waiter, driver, electrician, security guard) No
+
+Should we assign realistic job transitions (e.g., "Helper → House Boy → Driver") or keep them randomized? Yes. realistic job transitions will be promising for better results. Domestic jobs like House Cook, House Boy, House Driver, House Maid, House Nurse are also likely related. But watch out for gender restriction. 
+
+3. Description
+Should this be a short bio (e.g., "Experienced waiter looking for opportunities in a hotel.") or a detailed profile (e.g., "Worked as a waiter for 3 years, skilled in customer service and table management. Looking for jobs in hotels or restaurants.")? Keep this empty for now.
+
+Should we add some missing or incomplete descriptions for realism? yes total 1% from the whole dataset.
+
+Carefully generate me these columns for the generated 30 data for now according to these requirements, if this becomes successful we can move on the filling the Description.
+
+----------------------------------------------------------------------------------
+
+1. Gender Restrictions
+
+If a Male user has a Looking Job that is gender-restricted to Female (and vice versa), should I:
+Exclude such cases entirely? 
+Adjust the Looking Job based on the allowed gender from the dataset?
+
+you are the one who is generating the Skills, Interests, Previous Jobs, Looking Jobs columns. So for a male user only include an allowed job from the job dataset. or Adjust the Looking Job based on the allowed gender from the dataset.
+
+
+2. Previous Jobs & Looking Jobs Distribution
+
+What should be the approximate distribution for:
+Users with both Previous Jobs & Looking Jobs?
+Users with only Previous Jobs?
+Users with only Looking Jobs?
+Users with neither (but still have skills & interests)?
+
+This has many possibilities such as, 
+1. Users with both Previous Jobs & Looking Jobs - 
+- this can contain 1 Previous Jobs, 2 Looking Jobs 
+- this can contain 2 Previous Jobs, 1 Looking Jobs 
+- this can contain 2 Previous Jobs, 2 Looking Jobs or many other different way right.
+2. Users with only Previous Jobs?
+- this can contain 1 Previous Jobs
+- this can contain 2 Previous Jobs
+3. Users with only Looking Jobs?
+- this can contain 1 Looking Jobs
+- this can contain 2 Looking Jobs
+So basically this have to be in a random order and basically i can say is (including above patterns),
+Users with both Previous Jobs & Looking Jobs? 30% (looking jobs need to be more connected with previous job)
+Users with only Previous Jobs? 19%
+Users with only Looking Jobs? 20%
+Users with neither (but still have skills & interests)? 1%
+Users with a Looking Job same as Previous Job? 30%
+
+before proceeding, if you have further questions do ask me
+
+---------------------------------------------------------------------------------------
+
+In the above generated excel 5 of the data is wrong which is male job seekers have female job details (Skills, Interests, Previous Jobs, Looking Jobs). And below some requirements are changed. According to these i need to modify job_seeker_sample_unique.xlsx the Skills, Interests, Previous Jobs, Looking Jobs columns properly.
+
+Find the updated job_list-interest-skills.xlsx file.
+job_seeker_sample_unique.xlsx this is the file you need to fill in Skills, Interests, Previous Jobs, Looking Jobs columns.
+
+job_list-interest-skills.xlsx this file contains a 100 different job titles, skills related to each job titles and interests related to each job titles and also a dataset of 200 different job posts with job details such as Job Description, Skills Required, Experience Required, Looking gender. This will make you life easier to generate for like 700-900 data.
+
+10. Skills - So skills must contain minimum of 2 skills related to either a user's Previous Job or Looking Job or both Previous Job and Looking Job.
+
+11. Interests - Interests must contain minimum of 2 interests related to either a user's Previous Job or Looking Job or both Previous Job and Looking Job.
+
+12. Previous Jobs - A user may or may not have a previous job. A user may have a multiple previous jobs. If this column has a job title, then skills and interests related to this job should be updated in the skills column and interests column.
+
+13. Looking Jobs - A user may or may not have a looking Job. A user may have a multiple looking jobs. If this column has a job title, then skills and interests related to this job should be updated in the skills column and interests column.
+
+14. Description - empty for now
+
+Special conditions - 
+1. A Looking Job should be based on the previous job. That means a user having experience on some job will looking for the same job. A user can have both multiple previous jobs and looking jobs. Also a user may not have both a previous job or a looking job (In this case, still a user can have interests and skills).
+
+2. The gender of the user should be dependent with the jobs that they are eligible. "job_list" sheet of job_list-interest-skills.xlsx contains the looking gender for every job posts (male or female or male, female both).
+
+3. If two jobs in the same job category have common Skills & interests, then previous jobs or/and looking jobs can contain those two jobs (for example, "Health Assessment" skill is common for both Nurse and House Nurse, so where the skill is Health Assessment their previous jobs or/and looking jobs can be Nurse or House Nurse). But an unrelated jobs cannot contain be together.
+
+4. It is okay to have unmatching looking jobs for a very few data. But later in a "interaction dataset" we need to show that we ignored (or didn't show interest) these jobs.
+
+Your concerns - 
+1. Skills & Interests
+Should Skills be occupation-related (e.g., "Carpentry, Plumbing") or include general skills (e.g., "Teamwork, Problem-solving")? I have given a list of skills and interests for each job title.
+
+Should Interests be more personal (e.g., "Sports, Traveling") or career-related (e.g., "Learning new machinery, Customer service")? I have given a list of skills and interests for each job title. Use those skills and interests.
+
+2. Previous Jobs & Looking Jobs
+Should Previous Jobs be more aligned with Looking Jobs or do we allow career shifts?Previous Jobs be more aligned with Looking Jobs will be more promising for creating a high accuracy ML model.
+
+Should we mix low-skilled, semi-skilled, and skilled jobs for variety? (e.g., waiter, driver, electrician, security guard) No
+
+Should we assign realistic job transitions (e.g., "Helper → House Boy → Driver") or keep them randomized? Yes. realistic job transitions will be promising for better results. Domestic jobs like House Cook, House Boy, House Driver, House Maid, House Nurse are also likely related. But watch out for gender restriction. 
+
+3. Description
+Should this be a short bio (e.g., "Experienced waiter looking for opportunities in a hotel.") or a detailed profile (e.g., "Worked as a waiter for 3 years, skilled in customer service and table management. Looking for jobs in hotels or restaurants.")? Keep this empty for now.
+
+Should we add some missing or incomplete descriptions for realism? yes total 1% from the whole dataset.
+
+4. Gender Restrictions
+
+If a Male user has a Looking Job that is gender-restricted to Female (and vice versa), should I:
+Exclude such cases entirely? 
+Adjust the Looking Job based on the allowed gender from the dataset?
+
+you are the one who is generating the Skills, Interests, Previous Jobs, Looking Jobs columns. So for a male user only include an allowed job from the job dataset. or Adjust the Looking Job based on the allowed gender from the dataset.
+
+5. Previous Jobs & Looking Jobs Distribution
+
+What should be the approximate distribution for:
+Users with both Previous Jobs & Looking Jobs?
+Users with only Previous Jobs?
+Users with only Looking Jobs?
+Users with neither (but still have skills & interests)?
+
+This has many possibilities such as, 
+1. Users with both Previous Jobs & Looking Jobs - 
+- this can contain 1 Previous Jobs, 2 Looking Jobs 
+- this can contain 2 Previous Jobs, 1 Looking Jobs 
+- this can contain 2 Previous Jobs, 2 Looking Jobs or many other different way right.
+2. Users with only Previous Jobs?
+- this can contain 1 Previous Jobs
+- this can contain 2 Previous Jobs
+3. Users with only Looking Jobs?
+- this can contain 1 Looking Jobs
+- this can contain 2 Looking Jobs
+So basically this have to be in a random order and basically i can say is (including above patterns),
+Users with both Previous Jobs & Looking Jobs? 15% (looking jobs need to be more connected with previous job)
+Users with only Previous Jobs? 15%
+Users with only Looking Jobs? 15%
+Users with neither (but still have skills & interests)? 1%
+Users with a Looking Job same as Previous Job? 53%
+Users with unmatching previous job and looking jobs? 1%
+
+Carefully generate me these columns for the generated 30 data for now according to these requirements, if this becomes successful we can move on the filling the Description.
+
+before proceeding, if you have further questions do ask me
+
+-------------------------------------------------------------------------------------
+
+1. Gender Dependency on Looking Jobs:
+
+If a job has a gender restriction (e.g., "House Maid" is for females), should I exclude it entirely for a male seeker or replace it with a similar, gender-appropriate job (e.g., "House Boy")? You exclude it entirely for a male seeker and replace with a suitable female job seeker.
+
+2. Mixing of Previous and Looking Jobs:
+
+Should I strictly follow job category links (e.g., "Helper → House Boy → House Driver")? No
+Or should I allow slight career shifts within related fields (e.g., "Construction Helper → Mason")? It's fine.
+
+3. Interest & Skills Mapping:
+
+Should I allow some overlap in skills and interests (e.g., "House Driver" and "Driver" share "Vehicle Maintenance")? Yes, its fine
+Or should each record have distinct, non-overlapping entries? No
+
+4. Skills Randomization:
+
+Should I shuffle the order of skills & interests for variety? Yeah, i think it is okay
+Or keep them consistent based on job roles?
+
+5. Distribution Verification:
+
+Does this final distribution align with your needs?
+Users with both Previous Jobs & Looking Jobs: 30%
+Users with only Previous Jobs: 19%
+Users with only Looking Jobs: 20%
+Users with neither (but still have skills & interests): 1%
+Users with a Looking Job same as Previous Job: 30%
+
+Yes.
+
+before proceeding, if you have further questions do ask me
+
+
+-------------------------------------------------------------------------------------
+
+male job seekers should not have jobs that are gender-restricted to females (and vice versa).
+
+In this result Flower Decorator (Flower Shops), Waitress jobs are for females but two males seekers contain these jobs. What it is happening like that? Is this a mistake from you?
+I cannot generate 700-900 data like this. Because the accuracy will reduce.
+-------------------------------------------------------------------------------------
+-For 1 previous job
+Worked as a [Previous Jobs] for [between 1-5] years, skilled in [skill1] and [skill2]. Looking for jobs in hotels or restaurants.
+
+
+Worked as a waiter for 3 years, skilled in customer service and table management. Looking for jobs in hotels or restaurants.
+
+Worked as a House Driver, Commis Chef, skilled in Vehicle Maintenance, Private Transport and have a keen interest in Vehicle Maintenance, Cooking Assistance. Currently, looking for opportunities as House Driver, Commis Chef.
+
+Lalith Bandara has experience working as House Driver, Commis Chef. They are skilled in Vehicle Maintenance, Private Transport. They have a keen interest in Vehicle Maintenance, Cooking Assistance. Currently, they are looking for opportunities as House Driver, Commis Chef.
+
+
+
+---------------------------------------------------------------------------------------
+
+
+1. Total Expected Row Count:
+Should we aim for 700-900 additional rows on top of the 90 rows already generated? Yes
+Or should the final dataset total be between 700-900 rows including existing 90?
+
+2. Name Generation Strategy:
+Since we don’t have 700+ unique Sri Lankan names, I'll use a large set of common Sri Lankan names and randomly shuffle & reuse them across different records.
+Do you want a higher mix of male vs female names (e.g., 60% male, 40% female) or should I make it an even distribution? use higher mix of male vs female names.
+
+3. Job Assignment Logic:
+Right now, I am following the probability-based job assignment:
+15% have both previous and looking jobs
+15% have only previous jobs
+15% have only looking jobs
+1% have neither, but still have skills & interests
+54% have looking jobs same as previous jobs
+Should this distribution remain the same or do you want a different pattern for the larger dataset?
+
+if u can use the following values,
+25% have both previous and looking jobs
+15% have only previous jobs
+15% have only looking jobs
+1% have neither, but still have skills & interests
+44% have looking jobs same as previous jobs
+
+4. Education and Passport Distribution:
+The education and passport status distribution currently follows real-world probability (e.g., majority with O/L, A/L education, and 70% with valid passports). Do you want any adjustments to this distribution? No this is fine.
+
+5. Output Format:
+Would you like the final dataset split into multiple smaller files (e.g., 2-3 files for easier handling), or one single large file containing 700-900 rows? Anything is fine, i need in an excel format.
+
+
+before proceeding, if you have further questions do ask me
+
+---------------------------------------------------------------------------------------
+INTERACTION DATASET CREATION
+
+How should I handle missing Previous Jobs and Looking Jobs? 
+Should I assume these users explore various jobs randomly?
+
+Well, These are the percentage of dataset contains in the combination of skills, interests and Previous Jobs, Looking Jobs in user_data.
+25% have both previous and looking jobs
+15% have only previous jobs
+15% have only looking jobs
+1% have neither, but still have skills & interests (can view, click, apply based on the skills & interests)
+44% have looking jobs same as previous jobs
+
+So for each job title there are 2 jobs in the job_data. I want you include all jobs that are related for a user in the interaction data (related in the sense can include in skills and/or interests and/or Previous Jobs and/or Looking Jobs). 
+
+From all jobs that the users are including,
+1. view must include the least related job or jobs for the user (user is viewing the job)
+2. click must include the medium/average related job or jobs for the user (user is clicking the job)
+3. apply must include the most related / most suitable job or jobs for the user (user is applying for the job)
+
+With 900+ users with diverse profiles (user_data) and 200 job listings enriched with relevant skills, descriptions, and required qualifications (job_data) approximately how many interaction_data needed for the Hybrid Recommender System? and approximately how many interaction_data you can create?
+
+interaction_data – 5,000–10,000 interactions (views, clicks, applications) following your specified distribution.
+
+======================================================================================
+
+-----------------------------------NEW ML MODEL--------------------------------------
+
+NEW ML MODEL CODE
+
+import pandas as pd
+import numpy as np
+import pickle
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+
+# Step 1: Load the Dataset
+file_path = "main_dataset.xlsx"
+user_data = pd.read_excel(file_path, sheet_name="user_data")
+job_data = pd.read_excel(file_path, sheet_name="job_data")
+interaction_data = pd.read_excel(file_path, sheet_name="interaction_data")
+
+# Step 2: Data Preprocessing
+user_data.fillna('', inplace=True)
+job_data.fillna('', inplace=True)
+interaction_data.fillna(0, inplace=True)
+
+user_data['Profile'] = (
+    user_data['Skills'] + ' ' +
+    user_data['Interests'] + ' ' +
+    user_data['Previous Jobs'] + ' ' +
+    user_data['Looking Jobs'] + ' ' +
+    user_data['Description']
+)
+
+job_data['Details'] = (
+    job_data['Job Title'] + ' ' +
+    job_data['Skills Required'] + ' ' +
+    job_data['Experience Required'] + ' ' +
+    job_data['Job Description']
+)
+
+# Step 3: Vectorization with TF-IDF and Dimensionality Reduction
+combined_text = pd.concat([user_data['Profile'], job_data['Details']], axis=0)
+tfidf = TfidfVectorizer(stop_words="english", max_features=5000)  # Limit features to optimize performance
+tfidf_matrix = tfidf.fit_transform(combined_text)
+
+# Reduce dimensionality of TF-IDF matrix
+svd_tfidf = TruncatedSVD(n_components=200, random_state=42)
+reduced_tfidf_matrix = svd_tfidf.fit_transform(tfidf_matrix)
+
+# Split back into user and job matrices
+user_tfidf = reduced_tfidf_matrix[:len(user_data)]
+job_tfidf = reduced_tfidf_matrix[len(user_data):]
+
+# Step 4: Compute Content-Based Similarity
+similarity_matrix = cosine_similarity(user_tfidf, job_tfidf)
+
+# Step 5: Prepare Interaction Matrix for Collaborative Filtering
+interaction_matrix = interaction_data.pivot_table(
+    index='User ID', columns='Job ID', values='Interaction Value', fill_value=0
+)
+
+# Step 6: Train-Test Split
+train_data, test_data = train_test_split(interaction_data, test_size=0.2, random_state=42)
+train_interaction_matrix = train_data.pivot_table(
+    index='User ID', columns='Job ID', values='Interaction Value', fill_value=0
+)
+
+train_user_ids = train_interaction_matrix.index.tolist()
+train_job_ids = train_interaction_matrix.columns.tolist()
+
+# Step 7: Collaborative Filtering using SVD
+n_components = min(100, train_interaction_matrix.shape[1])  # Dynamically adjust components
+svd = TruncatedSVD(n_components=n_components, random_state=42)
+latent_matrix = svd.fit_transform(train_interaction_matrix)
+predicted_train_matrix = np.dot(latent_matrix, svd.components_)
+
+# Step 8: Hybrid Model
+scaler = MinMaxScaler()
+content_scores = scaler.fit_transform(similarity_matrix)
+collab_scores = scaler.fit_transform(predicted_train_matrix)
+
+# Align Job IDs in Both Matrices
+common_job_ids = list(set(job_data['Job ID']).intersection(set(train_job_ids)))
+job_indices_content = [list(job_data['Job ID']).index(job_id) for job_id in common_job_ids]
+job_indices_collab = [train_job_ids.index(job_id) for job_id in common_job_ids]
+
+content_scores_filtered = content_scores[:, job_indices_content]
+collab_scores_filtered = collab_scores[:, job_indices_collab]
+
+hybrid_scores = (0.5 * content_scores_filtered) + (0.5 * collab_scores_filtered)
+hybrid_scores = scaler.fit_transform(hybrid_scores)
+
+# Step 9: Generate Recommendations
+hybrid_recommendations = []
+for user_idx, user_id in enumerate(train_user_ids):
+    user_hybrid_scores = hybrid_scores[user_idx]
+    sorted_jobs = sorted(
+        enumerate(user_hybrid_scores), key=lambda x: x[1], reverse=True
+    )
+    top_jobs = [common_job_ids[job_idx] for job_idx, score in sorted_jobs[:5]]
+    hybrid_recommendations.append({"User ID": user_id, "Recommended Jobs": top_jobs})
+
+hybrid_recommendations_df = pd.DataFrame(hybrid_recommendations)
+
+# Step 10: Evaluation
+
+def mean_reciprocal_rank(predictions, actual):
+    reciprocal_ranks = []
+    for user in predictions.index:
+        if user in actual.index:
+            top_predictions = predictions.loc[user].sort_values(ascending=False).index
+            actual_jobs = actual.loc[user][actual.loc[user] > 0].index
+            for rank, job_id in enumerate(top_predictions, start=1):
+                if job_id in actual_jobs:
+                    reciprocal_ranks.append(1 / rank)
+                    break
+    return np.mean(reciprocal_ranks) if reciprocal_ranks else 0
+
+predicted_df = pd.DataFrame(predicted_train_matrix, index=train_user_ids, columns=train_job_ids)
+test_interactions = test_data.pivot_table(index='User ID', columns='Job ID', values='Interaction Value', fill_value=0)
+
+common_test_users = list(set(test_interactions.index).intersection(set(predicted_df.index)))
+common_test_jobs = list(set(test_interactions.columns).intersection(set(predicted_df.columns)))
+
+predicted_df_filtered = predicted_df.loc[common_test_users, common_test_jobs]
+test_interactions_filtered = test_interactions.loc[common_test_users, common_test_jobs]
+
+mrr = mean_reciprocal_rank(predicted_df_filtered, test_interactions_filtered)
+print(f"Mean Reciprocal Rank (MRR): {mrr:.4f}")
+
+# Step 11: Save Model
+with open("tfidf_vectorizer.pkl", "wb") as f:
+    pickle.dump(tfidf, f)
+
+with open("svd_model.pkl", "wb") as f:
+    pickle.dump(svd, f)
+
+predicted_df_filtered.to_pickle("predicted_matrix.pkl")
+
+print("Updated model trained and saved successfully!")
+-------------------------------------------------------------------------------------
+
+yeah i need to update my created ML model that we created with data splitting part, then after that i believe we can proceed with Testing and Evaluating the Model and Making Predictions with New Data
+
+--------------------------------------------------------------------------------
+
+Step 3: Testing and Evaluating the Model
+1. Apply the Model to Testing Data
+2. Evaluate Accuracy
+
+Step 4: Making Predictions with New Data
+1. Enter New Data
+2. Generate Predictions
+
+--------------------------------------------------------------------------------
+
+full code 
+
+
+import pandas as pd
+import numpy as np
+import pickle
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics import mean_squared_error, ndcg_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+
+# Step 1: Data Collection – Load dataset from Excel
+file_path = "main_dataset.xlsx"
+user_data = pd.read_excel(file_path, sheet_name="user_data")
+job_data = pd.read_excel(file_path, sheet_name="job_data")
+interaction_data = pd.read_excel(file_path, sheet_name="interaction_data")
+
+# Step 2: Data Preprocessing – Handle missing values, combine attributes
+user_data.fillna('', inplace=True)
+job_data.fillna('', inplace=True)
+interaction_data.fillna(0, inplace=True)
+
+user_data['Profile'] = (
+    user_data['Skills'] + ' ' +
+    user_data['Interests'] + ' ' +
+    user_data['Previous Jobs'] + ' ' +
+    user_data['Looking Jobs'] + ' ' +
+    user_data['Description']
+)
+
+job_data['Details'] = (
+    job_data['Job Title'] + ' ' +
+    job_data['Skills Required'] + ' ' +
+    job_data['Experience Required'] + ' ' +
+    job_data['Job Description']
+)
+
+# Step 3: Feature Engineering – TF-IDF vectorization for content-based filtering
+combined_text = pd.concat([user_data['Profile'], job_data['Details']], axis=0)
+tfidf = TfidfVectorizer(stop_words="english", max_features=5000)  # Limit features to optimize performance
+tfidf_matrix = tfidf.fit_transform(combined_text)
+
+# Reduce dimensionality of TF-IDF matrix
+svd_tfidf = TruncatedSVD(n_components=200, random_state=42)
+reduced_tfidf_matrix = svd_tfidf.fit_transform(tfidf_matrix)
+
+# Split back into user and job matrices
+user_tfidf = reduced_tfidf_matrix[:len(user_data)]
+job_tfidf = reduced_tfidf_matrix[len(user_data):]
+
+# Step 4: Model Training (Content-Based Filtering) – Compute cosine similarity
+similarity_matrix = cosine_similarity(user_tfidf, job_tfidf)
+
+# Step 5: Model Training (Collaborative Filtering) – SVD on interaction matrix
+interaction_matrix = interaction_data.pivot_table(
+    index='User ID', columns='Job ID', values='Interaction Value', fill_value=0
+)
+
+# Step 6: Hybrid Recommendation System – Combine both models
+train_data, test_data = train_test_split(interaction_data, test_size=0.2, random_state=42)
+train_interaction_matrix = train_data.pivot_table(
+    index='User ID', columns='Job ID', values='Interaction Value', fill_value=0
+)
+test_interaction_matrix = test_data.pivot_table(
+    index='User ID', columns='Job ID', values='Interaction Value', fill_value=0
+)
+
+train_user_ids = train_interaction_matrix.index.tolist()
+train_job_ids = train_interaction_matrix.columns.tolist()
+
+# Step 7: Hyperparameter Tuning – Optimize n_components
+n_components = min(100, train_interaction_matrix.shape[1])  # Dynamically adjust components
+svd = TruncatedSVD(n_components=n_components, random_state=42)
+latent_matrix = svd.fit_transform(train_interaction_matrix)
+predicted_train_matrix = np.dot(latent_matrix, svd.components_)
+
+# Normalize Scores
+scaler = MinMaxScaler()
+content_scores = scaler.fit_transform(similarity_matrix)
+collab_scores = scaler.fit_transform(predicted_train_matrix)
+
+# Find common user IDs in both matrices
+common_user_ids = list(set(user_data['User ID']).intersection(set(train_user_ids)))
+user_indices_content = [list(user_data['User ID']).index(user_id) for user_id in common_user_ids]
+user_indices_collab = [train_user_ids.index(user_id) for user_id in common_user_ids]
+
+# Find common job IDs in both matrices
+common_job_ids = list(set(job_data['Job ID']).intersection(set(train_job_ids)))
+job_indices_content = [list(job_data['Job ID']).index(job_id) for job_id in common_job_ids]
+job_indices_collab = [train_job_ids.index(job_id) for job_id in common_job_ids]
+
+# Filter both matrices based on common users and jobs
+content_scores_filtered = content_scores[user_indices_content][:, job_indices_content]
+collab_scores_filtered = collab_scores[user_indices_collab][:, job_indices_collab]
+
+hybrid_scores = (0.5 * content_scores_filtered) + (0.5 * collab_scores_filtered)
+hybrid_scores = scaler.fit_transform(hybrid_scores)
+
+# Step 8: Generate Recommendations
+hybrid_recommendations = []
+top_k = 5  # Number of job recommendations per user
+
+for user_idx, user_id in enumerate(common_user_ids):
+    user_hybrid_scores = hybrid_scores[user_idx]
+    sorted_jobs = sorted(
+        enumerate(user_hybrid_scores), key=lambda x: x[1], reverse=True
+    )
+    top_jobs = [common_job_ids[job_idx] for job_idx, score in sorted_jobs[:top_k]]
+    hybrid_recommendations.append({"User ID": user_id, "Recommended Jobs": top_jobs})
+
+hybrid_recommendations_df = pd.DataFrame(hybrid_recommendations)
+hybrid_recommendations_df.to_csv("generated_recommendations.csv", index=False)
+
+----1st way----
+## Step 9: Apply Model to Testing Data – Generate predictions for unseen users
+#predicted_test_matrix = np.dot(svd.transform(test_interaction_matrix), #svd.components_)
+#predicted_df_test = pd.DataFrame(predicted_test_matrix, #index=test_interaction_matrix.index, columns=test_interaction_matrix.columns)
+
+----2nd way----
+# Step 9:
+# Align test interaction matrix columns with training matrix
+common_test_jobs = list(set(train_interaction_matrix.columns).intersection(set(test_interaction_matrix.columns)))
+
+# Reindex test interaction matrix to match training job order
+test_interaction_matrix = test_interaction_matrix.reindex(columns=common_test_jobs, fill_value=0)
+
+# Apply SVD transformation correctly
+predicted_test_matrix = np.dot(svd.transform(test_interaction_matrix), svd.components_)
+
+# Convert to DataFrame
+predicted_df_test = pd.DataFrame(predicted_test_matrix, index=test_interaction_matrix.index, columns=common_test_jobs)
+
+----3rd way----
+# Step 9: Apply Model to Testing Data
+
+# Ensure test interaction matrix has the same columns as training
+test_interaction_matrix = test_interaction_matrix.reindex(columns=train_interaction_matrix.columns, fill_value=0)
+
+# Apply SVD transformation correctly
+predicted_test_matrix = np.dot(svd.transform(test_interaction_matrix), svd.components_)
+
+# Convert to DataFrame
+predicted_df_test = pd.DataFrame(predicted_test_matrix, index=test_interaction_matrix.index, columns=train_interaction_matrix.columns)
+
+
+
+# Step 10: Evaluate Model Performance – Compute Precision@K, Recall@K, NDCG, RMSE
+def precision_at_k(predictions, actual, k=5):
+    precision_scores = []
+    for user in predictions.index:
+        if user in actual.index:
+            top_k_predictions = predictions.loc[user].sort_values(ascending=False).head(k).index
+            actual_jobs = actual.loc[user][actual.loc[user] > 0].index
+            hits = len(set(top_k_predictions).intersection(set(actual_jobs)))
+            precision_scores.append(hits / k)
+    return sum(precision_scores) / len(precision_scores) if precision_scores else 0
+
+def recall_at_k(predictions, actual, k=5):
+    recall_scores = []
+    for user in predictions.index:
+        if user in actual.index:
+            top_k_predictions = predictions.loc[user].sort_values(ascending=False).head(k).index
+            actual_jobs = actual.loc[user][actual.loc[user] > 0].index
+            hits = len(set(top_k_predictions).intersection(set(actual_jobs)))
+            recall_scores.append(hits / len(actual_jobs) if len(actual_jobs) > 0 else 0)
+    return sum(recall_scores) / len(recall_scores) if recall_scores else 0
+
+precision = precision_at_k(predicted_df_test, test_interaction_matrix, k=5)
+recall = recall_at_k(predicted_df_test, test_interaction_matrix, k=5)
+ndcg = ndcg_score(test_interaction_matrix.values, predicted_df_test.values)
+rmse = np.sqrt(mean_squared_error(test_interaction_matrix.values.flatten(), predicted_df_test.values.flatten()))
+
+print(f"Precision@5: {precision:.4f}")
+print(f"Recall@5: {recall:.4f}")
+print(f"NDCG: {ndcg:.4f}")
+print(f"RMSE: {rmse:.4f}")
+
+# Step 11: Save Model – Store trained models using pickle
+with open("tfidf_vectorizer.pkl", "wb") as f:
+    pickle.dump(tfidf, f)
+
+with open("svd_model.pkl", "wb") as f:
+    pickle.dump(svd, f)
+
+predicted_df_test.to_pickle("predicted_matrix_test.pkl")
+
+print("Updated model trained, tested, and saved successfully!")
+
+
+
+custom accuracy metric
+
+def compute_accuracy(predictions, actual, k=5):
+    """
+    Computes accuracy as the percentage of users who received at least 
+    one relevant job in their top-K recommendations.
+
+    Args:
+        predictions (DataFrame): Predicted job rankings for each user.
+        actual (DataFrame): Actual user-job interactions.
+        k (int): Number of top recommendations to consider.
+
+    Returns:
+        float: Accuracy score.
+    """
+    correct_predictions = 0
+    total_users = len(predictions.index)
+
+    for user in predictions.index:
+        if user in actual.index:
+            top_k_predictions = predictions.loc[user].sort_values(ascending=False).head(k).index
+            actual_jobs = actual.loc[user][actual.loc[user] > 0].index
+            if len(set(top_k_predictions) & set(actual_jobs)) > 0:
+                correct_predictions += 1
+
+    return correct_predictions / total_users if total_users > 0 else 0
+
+# Example usage:
+accuracy = compute_accuracy(predicted_df_test, test_interaction_matrix, k=5)
+print(f"Custom Accuracy: {accuracy:.4f}")
+
+------------------------------------------------------------------------------------
+11. Handling Cold Start Problem – Provide recommendations for new users/jobs
+
+
+🔹 Handling Cold Start Problem: Provide Recommendations for New Users/Jobs
+The cold start problem occurs when:
+
+1. New users join the platform without prior interactions.
+2. New jobs are added that haven't received any applications.
+We need a fallback recommendation strategy for both cases.
+
+🔹 Solution: Cold Start Handling
+We will use two fallback approaches:
+
+1. For New Users:
+• Recommend popular jobs (jobs with the most applications).
+• Recommend jobs matching the user’s skills & interests.
+
+2. For New Jobs:
+• Recommend new jobs to users who match the job's required skills.
+
+✅ Step 1: Get Most Popular Jobs
+We determine job popularity based on the number of interactions.
+
+def get_popular_jobs(interaction_data, top_n=5):
+    """Returns the most popular jobs based on the number of applications."""
+    job_popularity = interaction_data['Job ID'].value_counts().head(top_n).index.tolist()
+    return job_popularity
+
+
+✅ Step 2: Recommend Jobs Based on User Profile
+For a new user, we check their skills & interests and recommend jobs accordingly.
+
+def recommend_jobs_for_new_user(user_profile, job_data, top_n=5):
+    """Recommends jobs based on a new user's skills & interests using TF-IDF similarity."""
+    user_vector = tfidf.transform([user_profile])
+    job_vectors = tfidf.transform(job_data['Details'])
+
+    # Compute similarity
+    similarity_scores = cosine_similarity(user_vector, job_vectors).flatten()
+
+    # Get top-N job indices
+    top_jobs_indices = similarity_scores.argsort()[-top_n:][::-1]
+    recommended_jobs = job_data.iloc[top_jobs_indices]['Job ID'].tolist()
+
+    return recommended_jobs
+
+✅ Step 3: Recommend New Jobs to Matching Users
+If a job is new, find users who have similar skills to the job's required skills.
+
+def recommend_new_jobs_to_users(new_jobs, user_data, job_data, top_n=5):
+    """Finds the best users for newly added jobs based on skills match."""
+    recommendations = {}
+
+    for _, job in new_jobs.iterrows():
+        job_vector = tfidf.transform([job['Details']])
+        user_vectors = tfidf.transform(user_data['Profile'])
+
+        # Compute similarity between job and users
+        similarity_scores = cosine_similarity(job_vector, user_vectors).flatten()
+
+        # Get top-N user indices
+        top_users_indices = similarity_scores.argsort()[-top_n:][::-1]
+        recommended_users = user_data.iloc[top_users_indices]['User ID'].tolist()
+
+        recommendations[job['Job ID']] = recommended_users
+
+    return recommendations
+
+✅ Step 4: Integrate Cold Start Recommendations
+We check if a user is new or if a job is new, and apply the appropriate fallback.
+
+def get_cold_start_recommendations(user_id, user_data, job_data, interaction_data):
+    """Handles cold start by providing fallback recommendations for new users or jobs."""
+    
+    # If the user is new (no prior interactions)
+    if user_id not in interaction_data['User ID'].unique():
+        print(f"User {user_id} is new. Providing cold-start recommendations.")
+        user_profile = user_data[user_data['User ID'] == user_id]['Profile'].values[0]
+        
+        # Recommend jobs based on user profile
+        return recommend_jobs_for_new_user(user_profile, job_data)
+    
+    return None  # No cold start needed for existing users
+
+✅ Step 5: Handle Cold Start for Jobs
+If new jobs exist, assign them to users who match their skillset.
+
+def get_cold_start_jobs(job_data, interaction_data):
+    """Finds jobs that have not received any applications (cold start jobs)."""
+    new_jobs = job_data[~job_data['Job ID'].isin(interaction_data['Job ID'].unique())]
+    if not new_jobs.empty:
+        print("New jobs detected. Finding best users for them.")
+        return recommend_new_jobs_to_users(new_jobs, user_data, job_data)
+    
+    return None  # No cold start jobs found
+
+
+🔹 Final Step: Apply Cold Start Strategy
+Integrate these functions when generating recommendations.
+
+# Example Usage:
+
+user_id = 999  # Example new user ID
+cold_start_recommendations = get_cold_start_recommendations(user_id, user_data, job_data, interaction_data)
+
+if cold_start_recommendations:
+    print(f"Cold Start Recommendations for User {user_id}: {cold_start_recommendations}")
+else:
+    print(f"User {user_id} has interactions, using normal recommendation system.")
+
+cold_start_jobs = get_cold_start_jobs(job_data, interaction_data)
+
+if cold_start_jobs:
+    print("Cold Start Job Assignments:", cold_start_jobs)
+
+
+🔹 Summary
+✅ Cold Start for New Users:
+
+If a user has no prior interactions, recommend popular jobs or jobs matching their profile.
+✅ Cold Start for New Jobs:
+
+If a job has no applications, recommend it to users with matching skills.
+
+---------------------------------------------------------------------------------------
+
+Show train - test results in ml model -> model evaluation (precision, recall)
+
+----------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
