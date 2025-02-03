@@ -399,13 +399,34 @@ git commit -m "Saving local changes"  # Commit changes
 git pull origin main       # Fetch the latest version from GitHub
 
 
+------Steps to make new updates in github----
 cd C:\final_year_project\app
 git status
 git add .
-git commit -m "create the expanded dataset"
+git commit -m "added the notes.txt"
 git pull origin main
 
 git push origin main
+
+
+-----check the exact URL of your GitHub repository----
+git remote -v
+
+
+-----show the last 5 commits--------
+git log --oneline -5
+
+-------restore the last saved version from GitHub-----------
+Option 1: Hard Reset (Completely Overwrites Local Changes)
+git fetch origin
+git reset --hard origin/main
+
+Option 2: If You Have Uncommitted Files You Might Want to Keep
+git stash
+git pull origin main
+
+git stash pop #restore your stashed changes if needed
+
 
 ---------------------------EXCEL DUMMY DATA CREATION-----------------------------------
 
