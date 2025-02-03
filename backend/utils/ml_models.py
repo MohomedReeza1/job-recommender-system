@@ -1,49 +1,91 @@
 import pickle
+import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sqlalchemy.orm import Session
-from models import JobSeeker, Job 
-from sklearn.feature_extraction.text import TfidfVectorizer
-
+from models import JobSeeker, Job
+from sklearn.preprocessing import MinMaxScaler
 
 # Load pre-trained ML models
 try:
     tfidf_vectorizer = pickle.load(open("ml_model/tfidf_vectorizer.pkl", "rb"))
+    svd_model = pickle.load(open("ml_model/svd_model.pkl", "rb"))
+    predicted_matrix = pickle.load(open("ml_model/predicted_matrix_test.pkl", "rb"))
 except FileNotFoundError as e:
-    print("Error loading TF-IDF model:", e)
-#     tfidf_vectorizer = None
+    print("Error loading ML model files:", e)
 
-def get_top_recommendations(seeker_id: int, db: Session, top_n: int = 6):
-    # Fetch seeker data
+def get_top_recommendations(seeker_id: int, db: Session, top_n: int = 3):
+    """
+    Generates job recommendations for an existing user using the hybrid model.
+    """
     seeker = db.query(JobSeeker).filter(JobSeeker.seeker_id == seeker_id).first()
     if not seeker:
         return []
 
-    # Combine seeker profile data for vectorization
+    # Create seeker profile text
     seeker_profile = f"{seeker.skills} {seeker.interests} {seeker.previous_jobs} {seeker.looking_jobs}"
     seeker_vector = tfidf_vectorizer.transform([seeker_profile])
 
-    # Vectorize all job descriptions
+    # Compute content-based similarity
     jobs = db.query(Job).all()
     job_descriptions = [job.job_description for job in jobs]
     job_vectors = tfidf_vectorizer.transform(job_descriptions)
+    similarity_scores = cosine_similarity(seeker_vector, job_vectors).flatten()
 
-    # Calculate similarity scores
-    similarity_scores = cosine_similarity(seeker_vector, job_vectors)
+    # Retrieve job IDs
+    job_ids = [job.job_id for job in jobs]
 
-    # Get top N job indices
-    top_indices = similarity_scores[0].argsort()[::-1][:top_n]
+    # Get collaborative filtering scores
+    collab_scores = predicted_matrix.mean(axis=0)  # Aggregate user predictions
+    scaler = MinMaxScaler()
+    similarity_scores_scaled = scaler.fit_transform(similarity_scores.reshape(-1, 1)).flatten()
+    # collab_scores_scaled = scaler.fit_transform(collab_scores.reshape(-1, 1)).flatten()
+    collab_scores_scaled = scaler.fit_transform(np.array(collab_scores).reshape(-1, 1)).flatten()
 
-    # Fetch corresponding jobs from the database
-    recommended_jobs = [jobs[i] for i in top_indices]
-    return recommended_jobs
+    # Ensure both arrays have the same shape
+    similarity_scores_scaled = similarity_scores_scaled[:len(collab_scores_scaled)]
+
+    # Compute hybrid scores
+    hybrid_scores = (0.5 * similarity_scores_scaled) + (0.5 * collab_scores_scaled)
+
+    # Get top job recommendations
+    top_job_indices = hybrid_scores.argsort()[-top_n:][::-1]
+    recommended_jobs = [job_ids[idx] for idx in top_job_indices]
+
+    return db.query(Job).filter(Job.job_id.in_(recommended_jobs)).all()
 
 
-def get_top_recommendations_from_data(seeker_data: dict, db: Session, top_n: int = 6):
+def get_top_recommendations_from_data(seeker_data: dict, db: Session, top_n: int = 3):
+    """
+    Generates job recommendations for a new user using their input profile data.
+    """
     seeker_profile = f"{seeker_data['skills']} {seeker_data['interests']} {seeker_data['previous_jobs']} {seeker_data['looking_jobs']}"
     seeker_vector = tfidf_vectorizer.transform([seeker_profile])
+
+    # Compute content-based similarity
     jobs = db.query(Job).all()
     job_descriptions = [job.job_description for job in jobs]
     job_vectors = tfidf_vectorizer.transform(job_descriptions)
-    similarity_scores = cosine_similarity(seeker_vector, job_vectors)
-    top_indices = similarity_scores[0].argsort()[::-1][:top_n]
-    return [jobs[i] for i in top_indices]
+    similarity_scores = cosine_similarity(seeker_vector, job_vectors).flatten()
+
+    # Retrieve job IDs
+    job_ids = [job.job_id for job in jobs]
+
+    # Get collaborative filtering scores
+    collab_scores = predicted_matrix.mean(axis=0)
+    scaler = MinMaxScaler()
+    similarity_scores_scaled = scaler.fit_transform(similarity_scores.reshape(-1, 1)).flatten()
+    # collab_scores_scaled = scaler.fit_transform(collab_scores.reshape(-1, 1)).flatten()
+    collab_scores_scaled = scaler.fit_transform(np.array(collab_scores).reshape(-1, 1)).flatten()
+
+    # Ensure both arrays have the same shape
+    similarity_scores_scaled = similarity_scores_scaled[:len(collab_scores_scaled)]
+
+    # Compute hybrid scores
+    hybrid_scores = (0.5 * similarity_scores_scaled) + (0.5 * collab_scores_scaled)
+
+    # Get top job recommendations
+    top_job_indices = hybrid_scores.argsort()[-top_n:][::-1]
+    recommended_jobs = [job_ids[idx] for idx in top_job_indices]
+
+    return db.query(Job).filter(Job.job_id.in_(recommended_jobs)).all()
+

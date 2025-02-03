@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { api, fetchRecommendationsWithForm } from "../services/api"; // Import here
+import { api } from "../services/api";
 import JobCard from "../components/JobCard"; 
-import "../styles/RecommendationsPage.css";
+import "../styles/RecommendationsPage.css"; 
 
 const RecommendationsPage = () => {
   const [formData, setFormData] = useState({
@@ -51,14 +51,14 @@ const RecommendationsPage = () => {
       return;
     }
     try {
-      const response = await fetchRecommendationsWithForm(formData);
-      setRecommendedJobs(response);
+      const response = await api.post("/recommendations/", formData);
+      setRecommendedJobs(response.data);
       setShowRecommendations(true);
     } catch (error) {
       console.error("Error fetching recommendations:", error);
       alert("Failed to get recommendations. Please try again.");
     }
-  };  
+  };
 
   const handleResetForm = () => {
     setFormData({
