@@ -45,6 +45,7 @@ const RecommendationsPage = () => {
     }
   };
 
+
   const handleGetRecommendations = async () => {
     if (!dataSaved) {
       alert("Please save your data before getting recommendations.");

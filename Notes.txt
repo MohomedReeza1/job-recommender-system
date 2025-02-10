@@ -403,7 +403,7 @@ git pull origin main       # Fetch the latest version from GitHub
 cd C:\final_year_project\app
 git status
 git add .
-git commit -m "added the notes.txt"
+git commit -m "added GitHub useful commands on notes.txt"
 git pull origin main
 
 git push origin main
@@ -1757,8 +1757,688 @@ If a job has no applications, recommend it to users with matching skills.
 
 ---------------------------------------------------------------------------------------
 
-Show train - test results in ml model -> model evaluation (precision, recall)
+Show train, test results in ml model -> model evaluation (precision, recall)
 
 ----------------------------------------------------------------------------------
-
+can i show matpltlib graphs for my ml model
 --------------------------------------------------------------------------------
+
+=========================IDP REPORT==================================================
+
+chapter 3:
+
+1. System Architecture & Components
+Could you confirm if you are following a three-tier architecture (Frontend - Backend - Database)? yes, we are following a three-tier architecture.
+
+Should I include a system architecture diagram? If yes, do you already have one, or should I design it based on your implementation? Yes, you need to include a system architecture diagram based on my implementation.
+
+2. UI/UX Design
+Do you have wireframes or UI mockups for the platform, or should I describe the UI based on the implemented React components? If you can create wireframes it would be great, if not give me guidance on how to create one. And i will include my frontend images for UI prototype.
+Should we emphasize accessibility and usability principles in the UI design section? yes it would be better.
+
+
+3. Algorithm Design
+Your recommendation system uses content-based filtering and collaborative filtering (SVD).
+Do you want me to include pseudocode for these algorithms? I want you to include pseudocode and i need to include a flowchart also.
+Should I describe how user-job matching works in more detail? Yes, include thorough details.
+Would you like me to add a workflow diagram showing how the recommendation process works? No need here. need to include workflow diagram in the "System Process Workflow" section.
+
+
+4. System Process Workflow
+Do you have a workflow diagram that illustrates how job seekers interact with the system, or should I create one based on the API flow? You need to create workflow diagram for the whole system (based on the API flow / how the recommendation process works)
+Should we describe how data flows between the frontend, backend, and database? yes, thoroughly explain in detail.
+
+
+
+5. Additional Preferences
+Should I follow a technical tone (for developers) or a mixed tone (for both technical readers and project evaluators)? yes, i think technical tone will be better.
+Do you want me to reference real-world examples or similar systems in the design section for context? yes, its fine to reference real-world examples
+
+
+
+--------------------------------------------------------------------------------------
+
+Don't give it as pointwise. please follow the report writing structure and give using a paragraph related to my project.
+
+--------------------------------------------------------------------------------------
+
+business output, give it to users as a real website.
+
+-----------------------------------------------------------------------------------
+
+Chapter 3: Design
+3.1 Chapter Overview
+3.2 Design Goals
+3.3 System Architecture Design
+3.4 Detailed Design
+3.5 Algorithm Design
+3.6 UI Design
+3.7 System Process Workflow
+3.8 Chapter Summary
+
+I need you to explain this Three-tier architecture (Presentation Tier, Application Tier, Data Tier) in well explained, detail oriented paragraphs.
+
+
+
+======================================================================================
+CHAPTER 3: Design
+3.1 Chapter Overview
+The design phase plays a crucial role in the development of the Job Recommendation Platform, ensuring that all system components are structured efficiently to meet performance, usability, and scalability requirements. This chapter details the architectural design, system workflow, algorithmic implementation, UI/UX considerations, and data flow. The design decisions align with the three-tier architecture approach, ensuring a modular and scalable implementation.
+3.2 Design Goals
+The design of the system is guided by the following objectives.
+Design Goal	Description
+Scalability	The platform should efficiently handle an increasing number of users and job postings.
+Usability	The UI should be intuitive, ensuring ease of use for job seekers and recruitment agencies.
+Efficiency	The recommendation algorithms should provide accurate and fast job suggestions.
+Modularity	The system should be developed with a three-tier architecture to allow independent modification of components.
+Security	User data must be protected through secure authentication and data encryption.
+Integration	The system should support seamless interaction between the frontend, backend, and database.
+
+3.3 System Architecture Design
+The system follows a three-tier architecture, consisting of the presentation tier, application tier and data tier. Below is a high-level architectural representation:
+(A system architecture diagram will be included here.)
+
+
+3.3.1 Presentation Tier
+The Presentation Layer serves as the user-facing component of the Job Recommendation Platform, developed using React.js. This layer is responsible for displaying job listings, personalized recommendations, and tracking application statuses. It facilitates seamless interaction between users and the system by offering an intuitive and responsive interface. Additionally, the frontend manages user authentication and profile management, ensuring secure access to user-specific functionalities. Communication with the backend occurs through RESTful APIs, allowing real-time data retrieval and interaction, thereby enhancing user experience and system efficiency.
+3.3.2 Application Tier
+The Application Layer, built using FastAPI, is the core processing unit of the platform. It manages user authentication, job searches, and recommendation logic, ensuring smooth interaction between users and the system. This layer processes job seeker profiles, applies machine learning algorithms to generate personalized job recommendations, and retrieves job listings based on user preferences. Additionally, the backend enforces security mechanisms, including JWT authentication for secure login and CORS middleware for cross-origin request handling, thereby maintaining data integrity and user privacy.
+3.3.3 Data Tier
+The Data Layer serves as the storage and retrieval engine of the platform, utilizing PostgreSQL as the database management system. It is responsible for maintaining structured records, including user profiles, job listings, application statuses, and user-job interactions. The database is optimized for fast retrieval of job recommendations, ensuring that queries are executed efficiently without compromising performance. Additionally, it maintains referential integrity and indexing, allowing for structured data management and consistent updates while preventing data redundancy or corruption.
+3.4 Detailed Design
+(Diagrams such as class, sequence, or flow diagrams will be included here.)
+
+The chosen design paradigm for this project is Object-Oriented Analysis and Design (OOAD). OOAD is a methodology that ensures the system is structured around objects, encapsulating both data and behavior. The platform follows an object-oriented approach where components such as job seekers, job listings, and applications are represented as distinct objects with defined attributes and methods. Using OOAD enables modularity, scalability, and ease of maintenance, as each component can be updated or modified independently without affecting the entire system. The interaction between these objects is facilitated by well-defined interfaces, allowing seamless integration of different system modules, including the frontend, backend, and database.
+3.4.1 Frontend Components
+The frontend comprises multiple key sections that allow users to navigate and interact with the platform effectively. The Homepage serves as the initial entry point, displaying a welcome message and guiding users through the platform's navigation. The Job Listings Page provides an organized list of available job opportunities, enabling users to browse and filter through postings relevant to their preferences. The Recommendations Page presents personalized job suggestions, leveraging machine learning algorithms to match users with suitable job roles. The Apply Job Page facilitates job applications by allowing job seekers to submit their details for specific positions. Lastly, the Profile Page provides users with the ability to manage and update their personal information, ensuring that their skills, experience, and job preferences remain current.
+3.4.2 Backend Components
+The backend, built using FastAPI, is responsible for handling all core functionalities and processing logic. FastAPI enables rapid API development and seamless communication between different system components. The Job Management Module retrieves and maintains job listings, allowing recruiters to post vacancies and seekers to view them. The Recommendation Engine, powered by machine learning algorithms, processes user data to generate highly relevant job recommendations. FastAPI is also responsible for handling API requests, managing the integration between the frontend and database, and ensuring optimized data exchange. The Application Processing Module tracks job applications, records application statuses, and provides job seekers with real-time updates. By utilizing FastAPI’s asynchronous processing capabilities, the backend ensures high performance and scalability.
+3.4.3 Machine Learning Component
+The machine learning component is deeply integrated into the recommendation engine to improve job-matching accuracy. The system employs content-based filtering using TF-IDF vectorization, where job descriptions and user profiles are converted into feature vectors, and collaborative filtering through Singular Value Decomposition (SVD), which analyzes job seeker interaction data to predict potential job preferences. These models are trained using job seeker profiles, historical application data, and job descriptions. FastAPI acts as the intermediary between the frontend and machine learning models, handling data preprocessing and model execution. When a job seeker requests recommendations, FastAPI processes the request, retrieves relevant data, and generates job suggestions in real-time by invoking the machine learning models. This architecture ensures a seamless flow of information, improving the accuracy and relevance of job recommendations.
+3.4.4 Database Schema
+The database serves as the backbone of the system, storing and managing critical data. The Users Table stores details such as seeker_id, name, age, skills, previous jobs, looking jobs, and passport status, capturing the full profile of job seekers. The Jobs Table holds job related information, including job_id, job_title, country, required_skills and experience_required, ensuring comprehensive job descriptions. The Applications Table records all job applications, associating application_id with the respective seeker_id and job_id, along with application statuses. Lastly, the User-Job Interactions Table logs interaction details such as interaction_id, seeker_id, job_id, interaction_type, and interaction_value, enabling efficient tracking of user engagement with job postings.
+3.5 Algorithm Design
+The system utilizes three primary recommendation algorithms, including a hybrid model that integrates both content-based and collaborative filtering approaches:
+3.5.1 Content-Based Filtering (TF-IDF Vectorization)
+Content-based filtering is a recommendation technique that evaluates the textual similarities between job descriptions and job seeker profiles. This approach leverages TF-IDF vectorization (Term Frequency-Inverse Document Frequency), which converts textual data into numerical values based on word importance. The TF-IDF method assigns higher weights to words that appear frequently in a document but less frequently across the entire dataset, ensuring that only the most relevant terms contribute to the recommendation process.
+The system first extracts key terms from job descriptions and user profiles, converting them into TF-IDF feature vectors. Once vectorization is complete, the cosine similarity metric is used to measure the similarity between the job seeker’s profile and each job description. Jobs with higher similarity scores are ranked higher and presented as recommendations.
+3.5.1.1 Pseudocode for Content-Based Filtering
+Input: Job Seeker Profile, Job Listings Database
+1. Convert job seeker profile into a TF-IDF vector
+2. Convert all job descriptions into TF-IDF vectors
+3. Compute cosine similarity between seeker vector and job vectors
+4. Rank jobs based on similarity score
+5. Return top N recommended jobs
+This approach ensures that job seekers receive recommendations that closely match their skills and interests, even if they are new to the platform and have not interacted with job postings before.
+3.5.2 Collaborative Filtering (Singular Value Decomposition - SVD)
+Collaborative filtering is a recommendation approach that predicts user preferences based on past interactions. Unlike content-based filtering, which relies on job descriptions, collaborative filtering uses historical data to identify job seekers with similar behavior patterns. The system builds a user-job interaction matrix, where rows represent job seekers, columns represent job postings, and values indicate past interactions (such as job applications or saved jobs).
+Since this matrix is often sparse, Singular Value Decomposition (SVD) is applied to reduce dimensionality and reveal latent features that describe the relationship between users and jobs. SVD decomposes the matrix into three smaller matrices, capturing patterns in user-job interactions. Using these latent factors, the system can predict missing values in the matrix, estimating a job seeker's preference for jobs they have not interacted with before.
+This method enhances the recommendation system by identifying jobs that similar users have applied for, making it particularly effective for job seekers who have a history of job searches and applications.
+3.5.2.1 Pseudocode for Collaborative Filtering (SVD)
+Input: User-Job Interaction Matrix
+1. Apply matrix factorization using SVD
+2. Decompose matrix into user and job latent features
+3. Predict missing job interactions for each user
+4. Rank jobs based on predicted interaction scores
+5. Return top N recommended jobs
+This approach continuously improves as more users interact with the platform, refining job recommendations over time based on evolving job-seeker preferences and industry trends.
+
+3.5.3 Hybrid Recommendation Model
+The Hybrid Recommendation Model combines the strengths of content-based filtering and collaborative filtering to deliver more accurate and personalized job recommendations. By integrating these two approaches, the system ensures that job seekers receive relevant job suggestions.
+How the Hybrid Model Works,
+1.	Content-based filtering is used to find jobs that match the user’s profile based on TF-IDF vectorization and cosine similarity.
+2.	Collaborative filtering (SVD) analyzes historical interactions of similar users to predict the most relevant jobs.
+3.	The system weights both approaches and combines the results to improve recommendation quality.
+4.	If a user has no prior interactions, the model relies more on content-based filtering.
+5.	If a user has sufficient interaction history, the collaborative filtering component plays a larger role.
+3.5.3.1 Pseudocode for Hybrid Model:
+Input: Job Seeker Profile, Job Listings Database, User-Job Interaction Data
+1. Compute TF-IDF similarity scores between seeker profile and job descriptions
+2. Compute SVD-based predictions for job interactions
+3. Combine both scores using a weighted approach
+4. Rank jobs based on combined similarity and preference scores
+5. Return top N recommended jobs
+This hybrid approach ensures that recommendations remain accurate, diverse, and adaptive to user behavior, making it more effective for both new and returning job seekers.
+Flowchart for Recommendation Process
+(A flowchart illustrating the recommendation algorithm will be included here.)
+3.6 UI Design
+The UI focuses on simplicity and accessibility by providing an easy-to-navigate and intuitive interface. It is designed to be responsive, ensuring optimal functionality across both mobile and desktop devices. To enhance usability, the system will incorporate features such as search filters and category-based job browsing, allowing users to efficiently find job opportunities that match their profiles once implemented.
+The user interface is attached in the Appendix A
+3.7 System Process Workflow
+The system workflow begins when a user logs in or registers on the platform. Once authenticated, their profile information is processed to match them with suitable job opportunities. The system retrieves relevant job listings from the database and feeds them into the recommendation engine, which generates personalized job matches based on the user’s profile and past interactions. When a user decides to apply for a job, the system records their application and updates its status accordingly. Job agencies then review these applications, assess candidates, and update the status of job postings. Finally, users receive updates on their application progress, ensuring they stay informed about their job search outcomes.
+The Workflow Diagram is attached in the Appendix B
+3.7.1.1 System Workflow Diagram
+[Insert Workflow Diagram Here]
+(A workflow diagram illustrating the API flow will be included here.)
+3.8 Chapter Summary
+This chapter provided a detailed breakdown of system architecture, UI/UX design, recommendation algorithms, and system workflow. The three-tier architecture ensures scalability, while the hybrid recommendation system enhances job matching accuracy. The next chapter will focus on implementation, including technology stack, API development, and integration.
+
+According to this chapter three, I need you to
+
+=======================================================================================
+
+📌 Chapter 3: Design
+
+System Architecture Diagram (Three-tier architecture: Frontend, Backend, Database, ML Model)
+Data Flow Diagram (DFD) (User interactions, API calls, database updates)
+Class Diagram (Main entities: Job Seeker, Job, Application, ML Model)
+📌 Chapter 4: Implementation
+
+Sequence Diagram (Job application process, recommendation flow)
+Deployment Diagram (Where components are hosted, e.g., React frontend, FastAPI backend, PostgreSQL DB)
+Activity Diagram (User registration, job recommendation process)
+
+======================================================================================
+3.3 System Architecture Design
+[Insert System Architecture Diagram Here]
+
+3.4 Detailed Design
+(Diagrams such as class, sequence, or flow diagrams will be included here.)
+
+3.5 Algorithm Design
+(A flowchart illustrating the recommendation algorithm will be included here.)
+
+3.7 System Process Workflow
+(A workflow diagram illustrating the API flow will be included here.)
+
+======================================================================================
+The design phase plays a crucial role in the development of the Job Recommendation Platform, ensuring that all system components are structured efficiently to meet performance, usability, and scalability requirements. This chapter details the architectural design, system workflow, algorithmic implementation, UI/UX considerations, and data flow. The design decisions align with the three-tier architecture approach, ensuring a modular and scalable implementation.
+
+
+rewrite these three tiers in well explained paragraph format instead of bullet points
+
+
+Purpose: Provide an in-depth look at system components.
+Content:
+oUse diagrams like class, sequence, or flow diagrams.
+oExplain how each component supports the system’s goals.
+
+
+i need to include that what FastAPI does in my webapp and state how these things are connected with FastAPI
+
+oUse diagrams like class, sequence, or flow diagrams.
+
+Detail the logic behind key algorithms and highlight how algorithms achieve desired outcomes.
+
+
+Describe the chosen design paradigm (e.g., OOAD, SSADM).
+
+
+can you give the below scalability to integration points in a table with design goal and description as the columns. 
+
+
+Hybrid Recommendation Model (can you edit only this part, not the whole report)
+
+
+add subtopic numbers for these topics (3.4.1)
+
+Can you edit this in a paragraph format instead of bullet points (can you edit only this part, not the whole report)
+
+=======================================================================================
+
+📌 Chapter 4: Implementation
+
+Sequence Diagram (Job application process, recommendation flow)
+Deployment Diagram (Where components are hosted, e.g., React frontend, FastAPI backend, PostgreSQL DB)
+Activity Diagram (User registration, job recommendation process)
+
+4.3 Core Functionalities Implementation (Under "Job Application Processing")
+1️⃣ Sequence Diagram - Job Application Process
+
+4.3 Core Functionalities Implementation (Under "Job Recommendation System")
+2️⃣ Sequence Diagram - Job Recommendation Flow
+
+4.2 Technology Selection (After discussing frontend, backend, database, and ML choices)
+3️⃣ Deployment Diagram - System Architecture
+
+4.4 User Interface Implementation (Before describing how the UI interacts with the backend)
+4️⃣ Activity Diagram - User Registration & Job Recommendation Process
+
+-------------------------------------------------------------------------------------
+chapter 5
+
+1. Model Performance Metrics
+
+Accuracy, Precision, Recall, and F1-score for classification tasks.
+RMSE, MAE, or MAPE if applicable to regression-based predictions.
+Comparison against baseline models.
+
+As you know already about my excel dataset. According to the model Evaluate Performance – Precision@K, Recall@K, NDCG, RMSE and MRR as below.
+MRR: 0.8174
+Precision@5: 0.2585
+Recall@5: 0.9851
+NDCG: 0.8564
+RMSE: 0.0270
+
+2. Dataset Testing
+
+How was the dataset split (train/test ratio)? 
+train_data, test_data = train_test_split(interaction_data, test_size=0.2, random_state=42)
+Did you use any benchmark datasets or only collected data? i only used collected data, with dataset created with the help of recruitment agency representatives.
+Any challenges faced with data preprocessing? Not much, below is my data preprocessing part,
+# Step 2: Data Preprocessing – Handle missing values, combine attributes
+user_data.fillna('', inplace=True)
+job_data.fillna('', inplace=True)
+interaction_data.fillna(0, inplace=True)
+
+user_data['Profile'] = (
+    user_data['Skills'] + ' ' +
+    user_data['Interests'] + ' ' +
+    user_data['Previous Jobs'] + ' ' +
+    user_data['Looking Jobs'] + ' ' +
+    user_data['Description']
+)
+
+job_data['Details'] = (
+    job_data['Job Title'] + ' ' +
+    job_data['Skills Required'] + ' ' +
+    job_data['Experience Required'] + ' ' +
+    job_data['Job Description']
+)
+
+3. Robustness and Edge Case Handling - Will write this step later.
+
+How did the model perform when tested with missing or noisy input data?
+Were any adversarial test cases introduced?
+
+4. Testing Results Interpretation
+
+Any observed biases or patterns in job recommendations? Yes, as tfidf-vectorizer (content-based filtering) shows promising results, sometimes the collabarative filtering (SVD) shows some bias to some jobs according to the user-job interaction data provided for training the model.
+Did the recommendations align well with user expectations? majority of the job recommendations align well with user expectations.
+Key areas identified for future improvements. 
+1. Need to improve collabarative filtering (SVD) algorithm in order to recommend jobs correctly with past user interaction data. 
+2. Currently gender restricted job recommendation is not implemented. Need to train the model based on the gender. (so that male only jobs not showing to females and vice versa). 
+3. Likewise considering other parameters to train the model with (age, Experience details, education)
+
+-----------------------------------------------------------------------------------
+I need you to modify 5.3 functional testing by including how/what we have tested inside each of Unit Testing, Integration Testing, System Testing based on my project
+
+I need you to modify 5.4 Non-Functional Testing by including how/what we have tested inside each of Performance Testing, Scalability Testing, Usability Testing, Reliability Testing based on my project. Make sure number them properly as subtopics
+
+
+I need to state that 5.4.1 Performance Testing, 5.4.2 Scalability Testing and 5.4.3 Usability Testing these three sections haven't done testing yet until the model and frontend to be finalized. And also including what i will do in future for these 3 sections(do not rewrite the whole report, edit only this part)
+
+---------------------------------------------------------------------------------------
+
+=======================================================================================
+ML Model.ipynb
+
+import pandas as pd
+import numpy as np
+import pickle
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+
+
+# Step 1: Data Collection – Load dataset from Excel
+file_path = "main_dataset.xlsx"
+user_data = pd.read_excel(file_path, sheet_name="user_data")
+job_data = pd.read_excel(file_path, sheet_name="job_data")
+interaction_data = pd.read_excel(file_path, sheet_name="interaction_data")
+
+# Step 2: Data Preprocessing – Handle missing values, combine attributes
+user_data.fillna('', inplace=True)
+job_data.fillna('', inplace=True)
+interaction_data.fillna(0, inplace=True)
+
+user_data['Profile'] = (
+    user_data['Skills'] + ' ' +
+    user_data['Interests'] + ' ' +
+    user_data['Previous Jobs'] + ' ' +
+    user_data['Looking Jobs'] + ' ' +
+    user_data['Description']
+)
+
+job_data['Details'] = (
+    job_data['Job Title'] + ' ' +
+    job_data['Skills Required'] + ' ' +
+    job_data['Experience Required'] + ' ' +
+    job_data['Job Description']
+)
+
+
+# Step 3: Feature Engineering – TF-IDF vectorization for content-based filtering
+combined_text = pd.concat([user_data['Profile'], job_data['Details']], axis=0)
+tfidf = TfidfVectorizer(stop_words="english", max_features=5000)  # Limit features to optimize performance
+tfidf_matrix = tfidf.fit_transform(combined_text)
+
+# Reduce dimensionality of TF-IDF matrix
+svd_tfidf = TruncatedSVD(n_components=200, random_state=42)
+reduced_tfidf_matrix = svd_tfidf.fit_transform(tfidf_matrix)
+
+# Split back into user and job matrices
+user_tfidf = reduced_tfidf_matrix[:len(user_data)]
+job_tfidf = reduced_tfidf_matrix[len(user_data):]
+
+# Step 4: Model Training (Content-Based Filtering) – Compute cosine similarity
+similarity_matrix = cosine_similarity(user_tfidf, job_tfidf)
+
+# Step 5: Model Training (Collaborative Filtering) – SVD on interaction matrix
+interaction_matrix = interaction_data.pivot_table(
+    index='User ID', columns='Job ID', values='Interaction Value', fill_value=0
+)
+
+# Step 6: Train-Test Split
+train_data, test_data = train_test_split(interaction_data, test_size=0.2, random_state=42)
+train_interaction_matrix = train_data.pivot_table(
+    index='User ID', columns='Job ID', values='Interaction Value', fill_value=0
+)
+test_interaction_matrix = test_data.pivot_table(
+    index='User ID', columns='Job ID', values='Interaction Value', fill_value=0
+)
+
+train_user_ids = train_interaction_matrix.index.tolist()
+train_job_ids = train_interaction_matrix.columns.tolist()
+
+
+# Step 7: Collaborative Filtering using SVD
+# Hyperparameter Tuning – Optimize n_components
+n_components = min(100, train_interaction_matrix.shape[1])  # Dynamically adjust components
+svd = TruncatedSVD(n_components=n_components, random_state=42)
+latent_matrix = svd.fit_transform(train_interaction_matrix)
+predicted_train_matrix = np.dot(latent_matrix, svd.components_)
+
+
+# Step 8: Hybrid Model
+# Normalize Scores
+scaler = MinMaxScaler()
+content_scores = scaler.fit_transform(similarity_matrix)
+collab_scores = scaler.fit_transform(predicted_train_matrix)
+
+# Find common user IDs in both matrices
+common_user_ids = list(set(user_data['User ID']).intersection(set(train_user_ids)))
+user_indices_content = [list(user_data['User ID']).index(user_id) for user_id in common_user_ids]
+user_indices_collab = [train_user_ids.index(user_id) for user_id in common_user_ids]
+
+# Find common job IDs in both matrices
+common_job_ids = list(set(job_data['Job ID']).intersection(set(train_job_ids)))
+job_indices_content = [list(job_data['Job ID']).index(job_id) for job_id in common_job_ids]
+job_indices_collab = [train_job_ids.index(job_id) for job_id in common_job_ids]
+
+# Filter both matrices based on common users and jobs
+content_scores_filtered = content_scores[user_indices_content][:, job_indices_content]
+collab_scores_filtered = collab_scores[user_indices_collab][:, job_indices_collab]
+
+hybrid_scores = (0.5 * content_scores_filtered) + (0.5 * collab_scores_filtered)
+hybrid_scores = scaler.fit_transform(hybrid_scores)
+
+
+# Step 9: Generate Recommendations
+hybrid_recommendations = []
+top_k = 5  # Number of job recommendations per user
+
+for user_idx, user_id in enumerate(common_user_ids):
+    user_hybrid_scores = hybrid_scores[user_idx]
+    sorted_jobs = sorted(
+        enumerate(user_hybrid_scores), key=lambda x: x[1], reverse=True
+    )
+    top_jobs = [common_job_ids[job_idx] for job_idx, score in sorted_jobs[:top_k]]
+    hybrid_recommendations.append({"User ID": user_id, "Recommended Jobs": top_jobs})
+
+hybrid_recommendations_df = pd.DataFrame(hybrid_recommendations)
+hybrid_recommendations_df.to_csv("generated_recommendations.csv", index=False)
+
+# Step 10: Apply Model to Testing Data
+
+# Ensure test interaction matrix has the same columns as training
+test_interaction_matrix = test_interaction_matrix.reindex(columns=train_interaction_matrix.columns, fill_value=0)
+
+# Apply SVD transformation correctly
+predicted_test_matrix = np.dot(svd.transform(test_interaction_matrix), svd.components_)
+
+# Convert to DataFrame
+predicted_df_test = pd.DataFrame(predicted_test_matrix, index=test_interaction_matrix.index, columns=train_interaction_matrix.columns)
+
+
+# Step 11: Evaluate Model Performance – Compute Precision@K, Recall@K, NDCG, RMSE
+def mean_reciprocal_rank(predictions, actual):
+    reciprocal_ranks = []
+    for user in predictions.index:
+        if user in actual.index:
+            top_predictions = predictions.loc[user].sort_values(ascending=False).index
+            actual_jobs = actual.loc[user][actual.loc[user] > 0].index
+            for rank, job_id in enumerate(top_predictions, start=1):
+                if job_id in actual_jobs:
+                    reciprocal_ranks.append(1 / rank)
+                    break
+    return np.mean(reciprocal_ranks) if reciprocal_ranks else 0
+
+def precision_at_k(predictions, actual, k=5):
+    precision_scores = []
+    for user in predictions.index:
+        if user in actual.index:
+            top_k_predictions = predictions.loc[user].sort_values(ascending=False).head(k).index
+            actual_jobs = actual.loc[user][actual.loc[user] > 0].index
+            hits = len(set(top_k_predictions).intersection(set(actual_jobs)))
+            precision_scores.append(hits / k)
+    return sum(precision_scores) / len(precision_scores) if precision_scores else 0
+
+def recall_at_k(predictions, actual, k=5):
+    recall_scores = []
+    for user in predictions.index:
+        if user in actual.index:
+            top_k_predictions = predictions.loc[user].sort_values(ascending=False).head(k).index
+            actual_jobs = actual.loc[user][actual.loc[user] > 0].index
+            hits = len(set(top_k_predictions).intersection(set(actual_jobs)))
+            recall_scores.append(hits / len(actual_jobs) if len(actual_jobs) > 0 else 0)
+    return sum(recall_scores) / len(recall_scores) if recall_scores else 0
+
+def compute_accuracy(predictions, actual, k=5):
+    correct_predictions = 0
+    total_users = len(predictions.index)
+
+    for user in predictions.index:
+        if user in actual.index:
+            top_k_predictions = predictions.loc[user].sort_values(ascending=False).head(k).index
+            actual_jobs = actual.loc[user][actual.loc[user] > 0].index
+            if len(set(top_k_predictions) & set(actual_jobs)) > 0:
+                correct_predictions += 1
+
+    return correct_predictions / total_users if total_users > 0 else 0
+
+mrr = mean_reciprocal_rank(predicted_df_test, test_interaction_matrix)
+precision = precision_at_k(predicted_df_test, test_interaction_matrix, k=5)
+recall = recall_at_k(predicted_df_test, test_interaction_matrix, k=5)
+ndcg = ndcg_score(test_interaction_matrix.values, predicted_df_test.values)
+rmse = np.sqrt(mean_squared_error(test_interaction_matrix.values.flatten(), predicted_df_test.values.flatten()))
+accuracy = compute_accuracy(predicted_df_test, test_interaction_matrix, k=5)
+
+print(f"MRR: {mrr:.4f}")
+print(f"Precision@5: {precision:.4f}")
+print(f"Recall@5: {recall:.4f}")
+print(f"NDCG: {ndcg:.4f}")
+print(f"RMSE: {rmse:.4f}")
+print(f"Accuracy: {accuracy:.4f}")
+
+MRR: 0.8174
+Precision@5: 0.2585
+Recall@5: 0.9851
+NDCG: 0.8564
+RMSE: 0.0270
+Accuracy: 0.9869
+
+
+
+# Making Predictions with New Data
+
+def get_job_recommendations_for_new_user(user_profile, job_data, tfidf, hybrid_scores, common_job_ids, top_k=5):
+    """
+    Generate job recommendations for a new user based on their profile.
+
+    Args:
+        user_profile (dict): New user profile containing all attributes.
+        job_data (DataFrame): Job dataset.
+        tfidf (TfidfVectorizer): Trained TF-IDF model.
+        hybrid_scores (ndarray): Hybrid model scores (content-based + collaborative filtering).
+        common_job_ids (list): List of jobs available in the hybrid model.
+        top_k (int): Number of job recommendations to return.
+
+    Returns:
+        DataFrame: Top-K recommended jobs with Job ID, Job Title, and Country.
+    """
+
+    # Convert user profile into a formatted text string
+    user_text = (
+        user_profile['Skills'] + ' ' +
+        user_profile['Interests'] + ' ' +
+        user_profile['Previous Jobs'] + ' ' +
+        user_profile['Looking Jobs'] + ' ' +
+        user_profile['Description']
+    )
+
+    # Convert new user profile into a TF-IDF vector
+    user_vector = tfidf.transform([user_text])
+
+    # Compute similarity with jobs
+    job_vectors = tfidf.transform(job_data['Details'])
+    similarity_scores = cosine_similarity(user_vector, job_vectors).flatten()
+
+    # Convert job IDs from job_data to a list
+    job_ids = job_data['Job ID'].tolist()
+
+    # Find the common job IDs between content-based and hybrid model
+    common_jobs_between_models = list(set(job_ids).intersection(set(common_job_ids)))
+
+    # Filter similarity scores to align with available hybrid model job IDs
+    job_indices_content = [job_ids.index(job_id) for job_id in common_jobs_between_models]
+    job_indices_hybrid = [common_job_ids.index(job_id) for job_id in common_jobs_between_models]
+
+    similarity_scores_filtered = similarity_scores[job_indices_content]
+    hybrid_scores_filtered = hybrid_scores[:, job_indices_hybrid]
+
+    # Compute final hybrid recommendation scores
+    final_scores = (0.5 * similarity_scores_filtered) + (0.5 * hybrid_scores_filtered.mean(axis=0))
+
+    # Select top K job recommendations
+    top_job_indices = final_scores.argsort()[-top_k:][::-1]
+    recommended_jobs = [common_jobs_between_models[idx] for idx in top_job_indices]
+
+    # Retrieve job details (Job ID, Job Title, Country)
+    recommended_job_details = job_data[job_data['Job ID'].isin(recommended_jobs)][['Job ID', 'Job Title', 'Country']]
+
+    return recommended_job_details
+
+
+# Example new user profile
+new_user_profile = {
+    "Skills": "Waiter, Customer Service, Hospitality",
+    "Interests": "Food, Service, Tourism",
+    "Previous Jobs": "Hotel Staff, Receptionist",
+    "Looking Jobs": "Waiter, Housekeeping, Hotel Staff",
+    "Description": "Looking for a job in the hospitality industry abroad",
+    "Passport Status": "Valid"
+}
+
+# Get top job recommendations for the new user
+recommended_jobs = get_job_recommendations_for_new_user(
+    new_user_profile, job_data, tfidf, hybrid_scores, common_job_ids, top_k=5
+)
+
+# print(f"Top job recommendations : {recommended_jobs}")
+
+# print("\nTop job recommendations:\n")
+# print(recommended_jobs.to_string(index=False))
+
+from tabulate import tabulate
+
+# Print nicely formatted table
+print("\nTop job recommendations:\n")
+print(tabulate(recommended_jobs, headers="keys", tablefmt="fancy_grid"))
+
+
+
+# Step 11: Save Model – Store trained models using pickle
+with open("tfidf_vectorizer.pkl", "wb") as f:
+    pickle.dump(tfidf, f)
+
+with open("svd_model.pkl", "wb") as f:
+    pickle.dump(svd, f)
+
+predicted_df_test.to_pickle("predicted_matrix_test.pkl")
+
+print("Updated model trained, tested, and saved successfully!")
+
+
+
+from google.colab import files
+
+# Download the saved files
+files.download("tfidf_vectorizer.pkl")
+files.download("svd_model.pkl")
+files.download("predicted_matrix_test.pkl")
+
+=======================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

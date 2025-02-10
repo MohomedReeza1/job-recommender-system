@@ -70,4 +70,3 @@ const ApplyJobPage = ({ isFromRecommendations }) => {
 };
 
 export default ApplyJobPage;
-

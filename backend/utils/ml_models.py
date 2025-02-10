@@ -88,4 +88,3 @@ def get_top_recommendations_from_data(seeker_data: dict, db: Session, top_n: int
     recommended_jobs = [job_ids[idx] for idx in top_job_indices]
 
     return db.query(Job).filter(Job.job_id.in_(recommended_jobs)).all()
-
