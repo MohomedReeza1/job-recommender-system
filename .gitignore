@@ -35,3 +35,6 @@ config.json
 *.log
 *.cache
 .DS_Store
+
+# Ignore environment variables
+backend/.env

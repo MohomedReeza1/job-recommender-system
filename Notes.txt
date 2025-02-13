@@ -2372,56 +2372,429 @@ files.download("svd_model.pkl")
 files.download("predicted_matrix_test.pkl")
 
 =======================================================================================
+SYSTEM IMPLEMENTATION STAGE 2
+=======================================================================================
+📌 Analysis of Missing Features & Enhancements Needed in Your Job Matching Platform
+Now that I’ve reviewed your Project Proposal & Requirement Specification (PPRS) and Interim Progress Demonstration (IPD), I’ll compare them with your current system implementation to identify:
+
+🚧 Missing Features - What hasn’t been implemented yet?
+🔧 Required Implementations - What still needs to be built?
+⚡ Enhancements Needed - What can be improved?
+✅ What Has Been Implemented Successfully?
+1️⃣ Core Functionalities - Backend (FastAPI)
+✔ Database & Models (PostgreSQL)
+✔ Job Seeker Registration & Profile Management
+✔ Job Posting & Retrieval (Recruitment Agencies)
+✔ Job Application Process (Seeker → Employer)
+✔ Job Recommendations using Hybrid ML Model
+✔ REST API Endpoints for Frontend Integration
+
+2️⃣ Machine Learning (Google Colab)
+✔ Hybrid Model (TF-IDF + SVD for Recommendations)
+✔ Job Seeker Profile-Based Recommendations
+✔ Collaborative Filtering for Returning Users
+✔ Basic ML Model Evaluation (MRR, Precision@K, Recall@K, RMSE)
+
+3️⃣ Frontend (React)
+✔ Navigation & Routing (routes.js)
+✔ Home, Jobs, Apply Job, Applied Jobs, Profile Pages
+✔ Recommendations Page (Form Submission & API Call)
+✔ Job Card & Listings Display
+✔ Basic UI for Job Applications
+
+🚧 Missing Features & Required Implementations
+
+1️⃣ User Authentication (🚨 Critical)
+🔴 Missing: Currently, seeker_id is hardcoded in API calls.
+✅ Needed: Implement JWT-based authentication to store and validate user sessions.
+
+Steps to Implement:
+Backend: Use FastAPI + OAuth2 to handle user authentication (/login, /register APIs).
+Frontend: Implement Login/Register Pages & store JWT token in localStorage.
+
+2️⃣ Job Search & Filtering System
+🔴 Missing: Users cannot search or filter jobs (location, salary, skills, etc.).
+✅ Needed: Implement job filtering (e.g., by location, skills, experience).
+
+Steps to Implement:
+Backend: Add API endpoint /jobs/search?query={term} for dynamic search.
+Frontend: Implement a search bar & dropdown filters on JobsPage.js.
+
+3️⃣ Multi-User Role Support (Job Seekers & Recruiters)
+🔴 Missing: No role-based access control (RBAC) for different users (seekers vs. agencies).
+✅ Needed: Implement Recruiter Login & Dashboard for managing job postings.
+
+Steps to Implement:
+Backend: Differentiate between JobSeeker and Recruiter users in the database.
+Frontend: Create Job Posting Form for agencies.
+
+4️⃣ Enhancing Job Recommendations
+🔴 Limitations in Current Model:
+
+Cold Start Problem: New users get poor recommendations.
+Lack of Personalization: Age, experience, education not considered in job matching.
+✅ Needed: Improve ML model personalization by incorporating:
+
+User profile completeness score
+More job attributes (contract type, benefits, location)
+Gender-specific job preferences
+
+5️⃣ Application Tracking & Status Updates
+🔴 Missing: Job seekers cannot track application status (pending, accepted, rejected).
+✅ Needed: Employers should update job application statuses.
+
+Steps to Implement:
+Backend: Add application_status field (pending → shortlisted → hired).
+Frontend: Show application status on AppliedJobsPage.js.
+
+6️⃣ Messaging & Notifications
+🔴 Missing: No communication between job seekers & recruiters.
+✅ Needed: Implement in-app messaging or email notifications.
+
+Steps to Implement:
+Backend: Create a messages table to store conversations.
+Frontend: Add a chat system between job seekers & recruiters.
+
+7️⃣ UI/UX Enhancements
+🔴 Issues in Current UI:
+
+No loading spinners when fetching API data.
+Job application process is basic (no resume upload, cover letter).
+Job recommendations lack detailed preview.
+✅ Needed:
+
+Add loaders while fetching jobs.
+Improve job application UI (resume upload, cover letter).
+Enhance recommendations display with sorting options.
+
+8️⃣ Deployment & Performance Optimization
+🔴 Missing: System is not deployed; needs cloud hosting & optimization.
+✅ Needed: Deploy to AWS/Heroku with database hosting.
+
+Steps to Deploy:
+Backend: Host FastAPI on Heroku/AWS Lambda.
+Database: Use Cloud PostgreSQL (AWS RDS).
+Frontend: Deploy React app on Netlify/Vercel.
+⚡ Summary of Next Steps
+🚨 High Priority (Critical)
+✅ Implement User Authentication (JWT-based login/register)
+✅ Fix Hardcoded seeker_id issue
+✅ Enhance ML Model to Address Cold Start & Personalization Issues
+✅ Allow Job Seekers to Track Job Applications & View Status
+
+🔧 Medium Priority
+✅ Add Job Search & Filters (Location, Salary, Skills)
+✅ Allow Agencies to Post Jobs & Manage Listings
+✅ Improve UI/UX (Loading Spinners, Job Previews, Resume Upload)
+✅ Enhance Recommendations UI with Sorting & Filtering Options
+
+🚀 Future Enhancements
+✅ Add In-App Messaging for Recruiters & Seekers
+✅ Deploy the System to Cloud (AWS/Heroku + PostgreSQL RDS)
+
+📢 Final Thoughts
+Your FYP has made excellent progress (~75% complete)! 🚀
+The remaining tasks focus on authentication, UI improvements, and job search functionalities.
+
+Would you like me to help prioritize these features and suggest an implementation roadmap? 📅
+---------------------------------------------------------------------------------------
+
+PROMPT
+
+1️⃣ User Authentication (🚨 Critical)
+✅ Needed: Implement JWT-based authentication to store and validate user sessions.
+
+2️⃣ Multi-User Role Support (Job Seekers & Recruiters)
+🔴 Missing: No role-based access control (RBAC) for different users (seekers vs. agencies).
+✅ Needed: Implement Recruiter Login & Dashboard for managing job postings.
+
+I need to modify the existing code or/and implement new code based on my existing developed system in order to achieve the goal of implementation of User Authentication and 
+Multi-User Role Support (Job Seekers & Recruiters); (Job Search & Filtering System, Enhancing Job Recommendations, Application Tracking & Status Updates, Messaging & Notifications, UI/UX Enhancements, Deployment & Performance Optimization - in future implementation)
+
+before going to codes; what needs to modify in order to achieve the above goal? what needs to newly create? what are problems need to face in order to achieve the goal according to the way we have implemented so far (if any)?
+
+Brief explanation: 
+🔧 Need to expand the current system as separate logins for job seekers and recruitment agencies:
+1. If a job seeker is registered/logged in they should be able to create a profile with (Name,Age,Gender,Height,Weight,Marital Status,Number of Children,Education,Skills,Interests,Previous Jobs,Looking Jobs,Description,Passport Status) and view all jobs, get recommendations, apply for jobs.
+
+2. Recruitment agency should be registered/logged in they should be able to create an agency profile with (name, license number and other suitable fields). (Here in future I may need a separate feature to verify the agency if this a legit agency by using the license number) and add jobs (with Job ID, Job Title, Country, Job Description, Skills Required, Experience Required, Age Required, Salary, Working Hour, Facilities, Looking gender, No. of job seekers required, Available Quantity as the fields), view all jobs and view users who have applied for their jobs.
+
+🔧 need to store job seekers profile data, job seekers applied jobs data, recruitment agency profile data, recruitment agency posts data, data of the users who have applied for each recruitment agency in Database.
+
+Suggest me a proper way to implement these requirements and maybe suggest an implementation roadmap?
+
+--------------------------------------------------------------------------------------
+📅 Suggested Implementation Roadmap
+📌 Phase 1: Authentication & Multi-User Role Setup
+✅ Modify Database (users, job_seekers, recruitment_agencies).
+✅ Implement JWT Authentication (Login/Register).
+✅ Restrict API Access Based on User Role.
+
+📌 Phase 2: Job Seeker Features
+✅ Allow Job Seekers to Create Profiles.
+✅ Enable Viewing & Applying to Jobs.
+✅ Fetch Job Recommendations for Logged-in Users.
+
+📌 Phase 3: Recruitment Agency Features
+✅ Allow Recruiters to Create Agency Profiles.
+✅ Enable Recruiters to Post & Manage Jobs.
+✅ Enable Recruiters to View Applicants for Their Jobs.
+
+📌 Phase 4: UI & UX Enhancements
+✅ Create Separate Dashboards for Job Seekers & Recruiters.
+✅ Improve Navigation & Display of Jobs & Applications.
+✅ Ensure Profile & Job Posting Pages Are Responsive.
+---------------------------------------------------------------------------------------
+
+📅 Phase-Wise Implementation Roadmap NEW
+
+
+📌 Phase 1: Authentication & Multi-User Role Setup
+
+✅ Modify Database (models.py)
+Add a User table for authentication with role (job_seeker or recruiter).
+Ensure each email is unique to prevent role conflicts.
+
+✅ Implement JWT Authentication (auth.py)
+Register & login functionality for job seekers & recruiters separately.
+
+✅ Restrict API Access Based on User Role
+Job Seekers → Can view jobs, apply for jobs, get recommendations.
+Recruiters → Can post & manage job listings, view applicants.
+🚨 Recruiters trying to apply for a job receive an error message guiding them to create a job seeker account.
+
+
+📌 Phase 2: Job Seeker Features
+
+✅ Allow Job Seekers to Create Profiles (job_seeker_profile.py)
+Fields: Name, Age, Gender, Height, Weight, Skills, Interests, Passport Status, etc.
+
+✅ Enable Viewing & Applying to Jobs (jobs.py)
+API: /jobs/ to view job listings
+API: /apply-job/ to apply for a job
+🚨 If a recruiter tries to apply, return: "You are signed in as a recruiter. Please create a job seeker account to apply."
+
+✅ Fetch Job Recommendations for Logged-in Users (recommendations.py)
+Recommend jobs based on job seeker profile & interactions
 
 
 
+📌 Phase 3: Recruitment Agency Features
+
+✅ Allow Recruiters to Create Agency Profiles (recruiters.py)
+Fields: First Name, Last Name, Company Name, License Number, Work Email
+
+✅ Enable Recruiters to Post & Manage Jobs (jobs.py)
+API: /post-job/ allows only recruiters to create jobs
+API: /my-posted-jobs/ shows jobs posted by a recruiter
+
+✅ Enable Recruiters to View Applicants for Their Jobs (applications.py)
+API: /job-applicants/{job_id}/ lists who applied for a recruiter’s job
 
 
+📌 Phase 4: Frontend UI & Role-Based Routing
+
+✅ Modify Navigation
+Homepage Header:
+"Login / Sign Up" (for job seekers only)
+"For Employers" (leads to employer signup page)
+Employer Signup Page (/employer-signup/)
+Includes Company Name, License Number, Work Email, Create Account
+Separate Login Pages
+Job Seekers Login (/login)
+Recruiters Login (/employer-login)
+
+✅ Separate Dashboards
+Job Seekers Dashboard (/dashboard-seeker)
+View jobs, apply, track applications
+Recruiters Dashboard (/dashboard-recruiter)
+Post jobs, view applicants
+
+--------------------------------------------------------------------------------------
+Folder Structure
+
+C:\final_year_project\app
+├── .git
+├── backend
+│   ├── .vscode
+│   ├── __pycache__
+│   ├── env
+│   │	 ├── Include
+│   │	 ├── Lib
+│   │	 ├── Scripts
+│   │	 ├── pyvenv.cfg
+│   │	 ├── 
+│   ├── ml_model
+│   │	 ├── ML_Model.ipynb
+│   │	 ├── predicted_matrix_test.pkl
+│   │	 ├── svd_model.pkl
+│   │	 ├── tfidf_vectorizer.pkl
+│   ├── routers
+│   │	 ├── __pycache__
+│   │	 ├── jobs.py
+│   │	 ├── recommendations.py	
+│   │	 ├── seekers.py
+│   │	 ├── auth.py
+│   ├── utils
+│   │	 ├── __pycache__
+│   │	 ├── ml_models.py
+│   ├── database.py
+│   ├── main.py
+│   ├── models.py
+│   ├── requirements.txt
+│   ├── schemas.py
+├── frontend 
+│   ├── node_modules
+│   ├── public
+│   ├── src
+│   │	 ├── assets
+│   │	 ├── components
+│   │	 │	  ├── Footer.js
+│   │	 │	  ├── JobCard.js
+│   │	 │	  ├── Navbar.js
+│   │	 ├── config
+│   │	 │	  ├── routes.js
+│   │	 ├── pages
+│   │	 │	  ├── AppliedJobsPage.js
+│   │	 │	  ├── ApplyJobPage.js
+│   │	 │	  ├── Home.js
+│   │	 │	  ├── JobsPage.js
+│   │	 │	  ├── ProfilePage.js
+│   │	 │	  ├── RecommendationsPage.js
+│   │	 ├── services
+│   │	 │	  ├── api.js
+│   │	 ├── styles
+│   │	 │	  ├── ApplyJobPages.css
+│   │	 │	  ├── Footer.css
+│   │	 │	  ├── Home.css
+│   │	 │	  ├── JobCard.css
+│   │	 │	  ├── JobsPage.css
+│   │	 │	  ├── Navbar.css
+│   │	 │	  ├── RecommendationsPage.css
+│   │	 ├── App.css
+│   │	 ├── App.js
+│   │	 ├── App.test.js
+│   │	 ├── index.css
+│   │	 ├── index.js
+│   │	 ├── logo.svg
+│   │	 ├── reportWebVitals.js
+│   │	 ├── setupTests.js
+│   │	 ├── 
+│   │	 ├──
+│   ├── .env
+│   ├── .gitignore
+│   ├── freeze
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── README.md
+│   ├── 
+│   ├── 
+└── Notes.txt 
 
 
+ATTACHED FILES
+(frontend files- AppliedJobsPage.js, ApplyJobPage.js, Home.js, JobsPage.js, ProfilePage.js, RecommendationsPage.js, api.js, JobCard.js, routes.js / backend files- jobs.py, recommendations.py, seekers.py, auth.py, ml_models.py, database.py, main.py, models.py, schemas.py)
+
+---------------------------------------------------------------------------------------
+
+📌 Database Schema (PostgreSQL)
+This schema ensures data integrity, role-based access control, and proper relationships.
+
+1️⃣ Users Table (Common Table for Both Roles)
+Stores all users and distinguishes them by role (job_seeker or recruiter).
+
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL, -- Hashed Password
+    role VARCHAR(20) CHECK (role IN ('job_seeker', 'recruiter')) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 
+2️⃣ Job Seekers Table
+Stores additional job seeker details, linked to users.user_id.
+
+CREATE TABLE job_seekers (
+    seeker_id SERIAL PRIMARY KEY,
+    user_id INT UNIQUE REFERENCES users(user_id) ON DELETE CASCADE,
+    age INT,
+    gender VARCHAR(10),
+    height DECIMAL(5,2),
+    weight DECIMAL(5,2),
+    marital_status VARCHAR(20),
+    num_of_children INT,
+    education VARCHAR(100),
+    skills TEXT, -- Comma-separated values
+    interests TEXT, -- Comma-separated values
+    previous_jobs TEXT, -- Comma-separated values
+    looking_jobs TEXT, -- Comma-separated values
+    description TEXT,
+    passport_status BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 
+3️⃣ Recruitment Agencies Table
+Stores additional details for recruitment agencies, linked to users.user_id.
+
+CREATE TABLE recruitment_agencies (
+    agency_id SERIAL PRIMARY KEY,
+    user_id INT UNIQUE REFERENCES users(user_id) ON DELETE CASCADE,
+    agency_name VARCHAR(100) NOT NULL,
+    license_number VARCHAR(50) UNIQUE NOT NULL, -- This can be used for future verification
+    contact_email VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 
+4️⃣ Jobs Table
+Stores job postings, linked to recruitment_agencies.agency_id.
+
+CREATE TABLE jobs (
+    job_id SERIAL PRIMARY KEY,
+    job_title VARCHAR(100) NOT NULL,
+    country VARCHAR(50) NOT NULL,
+    job_description TEXT NOT NULL,
+    skills_required TEXT NOT NULL,
+    experience_required VARCHAR(50),
+    age_required VARCHAR(10),
+    salary VARCHAR(20),
+    working_hours VARCHAR(20),
+    facilities TEXT,
+    looking_gender VARCHAR(20),
+    num_of_job_seekers_required INT,
+    available_quantity INT,
+    recruiter_id INT NOT NULL REFERENCES recruitment_agencies(agency_id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 
+5️⃣ Applied Jobs Table
+Stores which job seekers have applied for which jobs.
+
+CREATE TABLE applied_jobs (
+    application_id SERIAL PRIMARY KEY,
+    job_id INT REFERENCES jobs(job_id) ON DELETE CASCADE,
+    seeker_id INT REFERENCES job_seekers(seeker_id) ON DELETE CASCADE,
+    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (job_id, seeker_id) -- Prevents duplicate applications
+);
 
 
+📌 Entity-Relationship Diagram (ERD)
+Below is a simplified ERD representation:
 
+scss
 
+USERS (user_id) 
+ ├── JOB_SEEKERS (seeker_id) → APPLIED_JOBS (seeker_id, job_id)
+ ├── RECRUITMENT_AGENCIES (agency_id) → JOBS (job_id, recruiter_id)
 
+-----------------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Codes 2 - System Implementation Stage 2 
 
 
 
