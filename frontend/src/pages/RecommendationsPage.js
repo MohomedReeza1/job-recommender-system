@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api, fetchRecommendationsWithForm } from "../services/api"; // Import here
+import { api, fetchRecommendationsWithForm } from "../services/api";
 import JobCard from "../components/JobCard"; 
 import "../styles/RecommendationsPage.css";
 

@@ -2792,26 +2792,52 @@ USERS (user_id)
  ├── JOB_SEEKERS (seeker_id) → APPLIED_JOBS (seeker_id, job_id)
  ├── RECRUITMENT_AGENCIES (agency_id) → JOBS (job_id, recruiter_id)
 
------------------------------------------------------------------------------------------
-
+=======================================================================================
 Codes 2 - System Implementation Stage 2 
 
 
+=======================================================================================
+Insert statements for DB
+
+INSERT INTO jobs (job_id, job_title, country, job_description, skills_required, experience_required, age_required, salary, working_hours, facilities, looking_gender, num_of_job_seekers_required, available_quantity, recruiter_id, created_at)
+VALUES (1, 'Carpenter', 'Singapore', 'This is a job for a Carpenter in Singapore. As a Carpenter, you will be responsible for woodworking, ensuring efficiency and quality in your role. Your key duties will include blueprint reading, furniture making, and other essential tasks, while maintaining high industry standards and workplace safety. You should have strong Woodworking, Blueprint reading, Furniture making skills and the ability to work in a fast-paced, professional setting. Prior experience in carpenter is preferred but not mandatory. If you are detail-oriented, hardworking, and looking for an opportunity to grow your career in Singapore, this role is for you.', 'Woodworking, Blueprint Reading, Furniture Crafting, Framing and Joinery, Measurement & Precision', '1st time', '30-50', 'Rs. 269,067.00', '9 hours', 'Accommodation, Medical, Meal Allowance', 'male, female', 77, 43, 1, NOW());
+
+INSERT INTO recruitment_agencies (job_id, job_title, country, job_description, skills_required, experience_required, age_required, salary, working_hours, facilities, looking_gender, num_of_job_seekers_required, available_quantity, recruiter_id, created_at)
+VALUES (1, 'Carpenter', 'Singapore',  NOW());
+
+INSERT INTO recruitment_agencies (agency_id, agency_name, agency_location, license_number, contact_email, user_id, created_at)
+VALUES (1, 'Al Akeem', 'Kurunegala', '1435', 'admin@alakeem.com', 1, NOW());
 
 
+'2025-02-13 10:00:00'
+---------------------------------------------------------------------------------------
 
+1. http://127.0.0.1:8000/auth/register
+JOB SEEKER
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwicm9sZSI6ImpvYl9zZWVrZXIiLCJleHAiOjE3Mzk2Mjg4MzV9.lf-y5pMe04Bj_0UrpsJjxrqBjxYGMijeM1tx2PFFpyM",
+    "token_type": "bearer"
+}
 
+RECRUITER
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2hud2F5bmVAZXhhbXBsZS5jb20iLCJyb2xlIjoicmVjcnVpdGVyIiwiZXhwIjoxNzM5NjI5NjQ5fQ.sDCL6fDNC8PvpyPa-XqIrn3giT9YzZnOzeFSl5ejRRg",
+    "token_type": "bearer"
+}
 
+2. http://127.0.0.1:8000/auth/login
+JOB SEEKER
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwicm9sZSI6ImpvYl9zZWVrZXIiLCJleHAiOjE3Mzk2NTE4Mzh9.OyuPmAgEwffacMTp1IchKkqY7ciBZX6FahngUWjXDnA",
+    "token_type": "bearer"
+}
 
+RECRUITER
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2hud2F5bmVAZXhhbXBsZS5jb20iLCJyb2xlIjoicmVjcnVpdGVyIiwiZXhwIjoxNzM5NjUxODcwfQ.ebVDXevEooSjgr2n5-Y-FevO6lQm3woAZze1SBgsEc8",
+    "token_type": "bearer"
+}
 
-
-
-
-
-
-
-
-
-
+---------------------------------------------------------------------------------------
 
 

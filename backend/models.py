@@ -87,7 +87,7 @@ class Job(Base):
 class AppliedJob(Base):
     __tablename__ = "applied_jobs"
 
-    application_id = Column(Integer, primary_key=True, index=True)
+    application_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     job_id = Column(Integer, ForeignKey("jobs.job_id", ondelete="CASCADE"), nullable=False)
     seeker_id = Column(Integer, ForeignKey("job_seekers.seeker_id", ondelete="CASCADE"), nullable=False)
     applied_at = Column(TIMESTAMP, server_default=func.now())
