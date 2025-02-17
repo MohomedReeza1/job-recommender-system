@@ -40,3 +40,13 @@ export const fetchRecommendationsWithForm = async (formData) => {
     throw error;
   }
 };
+
+export const fetchAppliedJobs = async (seekerId) => {
+  try {
+    const response = await api.get(`/applied-jobs/${seekerId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching applied jobs:", error);
+    throw error;
+  }
+};

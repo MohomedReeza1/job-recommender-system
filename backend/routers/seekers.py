@@ -24,10 +24,22 @@ def apply_job(seeker_id: int, job_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Successfully applied for the job."}
 
+@router.get("/applied-jobs/{seeker_id}")
+def get_applied_jobs(seeker_id: int, db: Session = Depends(get_db)):
+    """
+    Fetches all jobs that a specific job seeker has applied for.
+    """
+    applied_jobs = db.query(AppliedJob).filter(AppliedJob.seeker_id == seeker_id).all()
 
-# @router.get("/applied-jobs/{seeker_id}")
-# def get_applied_jobs(seeker_id: int, db: Session = Depends(get_db)):
-#     applied_jobs = db.query(AppliedJob).filter_by(seeker_id=seeker_id).all()
-#     return [{"job_id": aj.job.job_id, "job_title": aj.job.job_title, "country": aj.job.country} for aj in applied_jobs]
+    if not applied_jobs:
+        raise HTTPException(status_code=404, detail="No applied jobs found.")
 
-
+    return [
+        {
+            "job_id": aj.job.job_id,
+            "job_title": aj.job.job_title,
+            "country": aj.job.country,
+            "applied_at": aj.applied_at
+        }
+        for aj in applied_jobs
+    ]

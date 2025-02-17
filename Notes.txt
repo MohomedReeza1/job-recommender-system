@@ -2827,17 +2827,42 @@ RECRUITER
 
 2. http://127.0.0.1:8000/auth/login
 JOB SEEKER
+johndoe@example.com
+test1234
 {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwicm9sZSI6ImpvYl9zZWVrZXIiLCJleHAiOjE3Mzk2NTE4Mzh9.OyuPmAgEwffacMTp1IchKkqY7ciBZX6FahngUWjXDnA",
     "token_type": "bearer"
 }
 
 RECRUITER
+johnwayne@example.com
+test123
 {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2hud2F5bmVAZXhhbXBsZS5jb20iLCJyb2xlIjoicmVjcnVpdGVyIiwiZXhwIjoxNzM5NjUxODcwfQ.ebVDXevEooSjgr2n5-Y-FevO6lQm3woAZze1SBgsEc8",
     "token_type": "bearer"
 }
 
 ---------------------------------------------------------------------------------------
+AppliedJobsPage.js
+
+  // useEffect(() => {
+  //   const fetchAppliedJobs = async () => {
+  //     try {
+  //       const response = await api.get(`/applied-jobs/1`); // Replace with dynamic ID later
+  //       console.log("Applied Jobs API Response:", response.data); // ✅ Debug log
+  //       setAppliedJobs(response.data);
+  //     } catch (error) {
+  //       console.error("Error fetching applied jobs:", error);
+  //     }
+  //   };
+  
+  //   fetchAppliedJobs();
+  // }, []);
+
+
+--------------------------------------------------------------------------------------
+
+
+
 
 

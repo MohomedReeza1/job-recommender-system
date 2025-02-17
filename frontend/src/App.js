@@ -4,7 +4,8 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import JobsPage from "./pages/JobsPage";
 import RecommendationsPage from "./pages/RecommendationsPage";
-import ApplyJobPage from "./pages/ApplyJobPage";
+import AppliedJobsPage from "./pages/AppliedJobsPage";
+import ProfilePage from "./pages/ProfilePage";
 import Footer from "./components/Footer";
 
 const App = () => {
@@ -15,7 +16,8 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/jobs" element={<JobsPage />} />
         <Route path="/recommendations" element={<RecommendationsPage />} />
-        <Route path="/apply-job/:jobId" element={<ApplyJobPage />} />
+        <Route path="/applied-jobs" element={<AppliedJobsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
       <Footer />
     </Router>
