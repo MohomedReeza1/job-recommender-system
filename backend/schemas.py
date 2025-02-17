@@ -54,6 +54,7 @@ class JobSeekerResponse(JobSeekerBase):
 # 3️⃣ Recruitment Agency Schema
 class RecruitmentAgencyBase(BaseModel):
     agency_name: str
+    agency_location: str
     license_number: str
     contact_email: Optional[EmailStr]
 

@@ -2693,8 +2693,8 @@ C:\final_year_project\app
 
 
 ATTACHED FILES
-(frontend files- AppliedJobsPage.js, ApplyJobPage.js, Home.js, JobsPage.js, ProfilePage.js, RecommendationsPage.js, api.js, JobCard.js, routes.js / backend files- jobs.py, recommendations.py, seekers.py, auth.py, ml_models.py, database.py, main.py, models.py, schemas.py)
-
+(frontend files- AppliedJobsPage.js, ApplyJobPage.js, Home.js, JobsPage.js, ProfilePage.js, RecommendationsPage.js, api.js, App.js, index.js, routes.js, AuthContext.js
+backend files- jobs.py, recommendations.py, seekers.py, auth.py, ml_models.py, database.py, main.py, models.py, schemas.py) 
 ---------------------------------------------------------------------------------------
 
 📌 Database Schema (PostgreSQL)
@@ -2812,57 +2812,93 @@ VALUES (1, 'Al Akeem', 'Kurunegala', '1435', 'admin@alakeem.com', 1, NOW());
 '2025-02-13 10:00:00'
 ---------------------------------------------------------------------------------------
 
-1. http://127.0.0.1:8000/auth/register
-JOB SEEKER
-{
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwicm9sZSI6ImpvYl9zZWVrZXIiLCJleHAiOjE3Mzk2Mjg4MzV9.lf-y5pMe04Bj_0UrpsJjxrqBjxYGMijeM1tx2PFFpyM",
-    "token_type": "bearer"
-}
+1. JOB SEEKER
+reez@example.com - test123
+johndoe@example.com - test1234
 
-RECRUITER
-{
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2hud2F5bmVAZXhhbXBsZS5jb20iLCJyb2xlIjoicmVjcnVpdGVyIiwiZXhwIjoxNzM5NjI5NjQ5fQ.sDCL6fDNC8PvpyPa-XqIrn3giT9YzZnOzeFSl5ejRRg",
-    "token_type": "bearer"
-}
-
-2. http://127.0.0.1:8000/auth/login
-JOB SEEKER
-johndoe@example.com
-test1234
-{
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwicm9sZSI6ImpvYl9zZWVrZXIiLCJleHAiOjE3Mzk2NTE4Mzh9.OyuPmAgEwffacMTp1IchKkqY7ciBZX6FahngUWjXDnA",
-    "token_type": "bearer"
-}
-
-RECRUITER
-johnwayne@example.com
-test123
-{
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2hud2F5bmVAZXhhbXBsZS5jb20iLCJyb2xlIjoicmVjcnVpdGVyIiwiZXhwIjoxNzM5NjUxODcwfQ.ebVDXevEooSjgr2n5-Y-FevO6lQm3woAZze1SBgsEc8",
-    "token_type": "bearer"
-}
+2. RECRUITER
+user@alakeem.com - test123
+johnwayne@example.com  - test123
 
 ---------------------------------------------------------------------------------------
-AppliedJobsPage.js
+USERS TABLE
+----------------------------------------------------------------------
+| user_id      email		   role		isactive   name	     |
+----------------------------------------------------------------------
+|  1	"admin@alakeem.com"	"recruiter"	true	"Al Akeem"   |
+|  5	"johndoe@example.com"	"job_seeker"	true	"John Doe"   |
+|  6	"johnwayne@example.com"	"recruiter"	true	"John Wayne" |
+|  7	"user@alakeem.com"	"recruiter"	true	"Al Akeem"   |	
+|  8	"reez@example.com"	"job_seeker"	true	"reez"       |
+----------------------------------------------------------------------
 
-  // useEffect(() => {
-  //   const fetchAppliedJobs = async () => {
-  //     try {
-  //       const response = await api.get(`/applied-jobs/1`); // Replace with dynamic ID later
-  //       console.log("Applied Jobs API Response:", response.data); // ✅ Debug log
-  //       setAppliedJobs(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching applied jobs:", error);
-  //     }
-  //   };
-  
-  //   fetchAppliedJobs();
-  // }, []);
+JOB SEEKER TABLE
+------------------------------------
+| seeker_id   user_id	   name    |
+------------------------------------
+|    1		5	"John Doe" |
+|    4		8	"Reeza"    |
+------------------------------------
+
+recruitment_agencies TABLE
+--------------------------------------------------------------------------------------
+| agency_id	agency name	location	lno	  email		     user_id |
+--------------------------------------------------------------------------------------
+|    1		"Al Akeem"	"Kurunegala"	"1435"	"admin@alakeem.com"	1    |
+|    2		"Al Akeem2"	"Kurunegala"	"1436"	"bd@alakeem.com"	6    |
+|    5		"Al Akeem Pvt Ltd" "Kurunegala"	"1440"	"user@alakeem.com"	7    |
+--------------------------------------------------------------------------------------
+
+JOBS TABLE
+-----------------------------------------------------------
+| job_id  job title		 country     recruiter_id |
+-----------------------------------------------------------
+|  1	"Carpenter"		"Singapore"	1	  |
+|  3	"Software Developer"	"UAE"		2	  |
+|  4	"Software Developer 2"	"UAE"		2	  |
+|  5	"Software Developer 4"	"UAE"		1	  |
+|  9	"Driver"		"UAE"		5	  |
+-----------------------------------------------------------
+
+
+APPLIED JOBS TABLE
+---------------------------------
+| seeker_id   job_id   appl_id  |
+---------------------------------
+|	1	3	1       |  
+|	1	5	3       |  
+|	1	1	4       |  
+|	3	3	5       |
+|	4	9	6       |  
+---------------------------------
+
+
+
+---------------------------------------------------------------------------------------
+
+JOB CREATE
+{
+  "job_title": "Software Engineer",
+  "country": "UAE",
+  "job_description": "Develop and maintain applications.",
+  "skills_required": "Python, FastAPI",
+  "experience_required": "2 years",
+  "age_required": "25-40",
+  "salary": "5000 AED",
+  "working_hours": "9AM-6PM",
+  "facilities": "Accommodation, Transport",
+  "looking_gender": "Any",
+  "num_of_job_seekers_required": 5,
+  "available_quantity": 5,
+  "recruiter_id": 1
+}
 
 
 --------------------------------------------------------------------------------------
 
-
+PHASE 3 ERRORS
+-> my jobs are showing for all agencies even when we log from different agencies
+-> my job applicantss are showing for all agencies even when we log from different agencies
 
 
 
