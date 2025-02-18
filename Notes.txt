@@ -2695,6 +2695,11 @@ C:\final_year_project\app
 ATTACHED FILES
 (frontend files- AppliedJobsPage.js, ApplyJobPage.js, Home.js, JobsPage.js, ProfilePage.js, RecommendationsPage.js, api.js, App.js, index.js, routes.js, AuthContext.js
 backend files- jobs.py, recommendations.py, seekers.py, auth.py, ml_models.py, database.py, main.py, models.py, schemas.py) 
+
+
+ATTACHED FILES
+(frontend files-  routes.js, AuthContext.js, AppliedJobsPage.js, ApplyJobPage.js, Home.js, JobsPage.js, ProfilePage.js, RecommendationsPage.js, api.js, Navbar.js
+backend files- jobs.py, recommendations.py, seekers.py, auth.py, ml_models.py, database.py, main.py, models.py, schemas.py, recruiters.py) 
 ---------------------------------------------------------------------------------------
 
 📌 Database Schema (PostgreSQL)
@@ -2899,6 +2904,31 @@ JOB CREATE
 PHASE 3 ERRORS
 -> my jobs are showing for all agencies even when we log from different agencies
 -> my job applicantss are showing for all agencies even when we log from different agencies
+
+--------------------------------------------------------------------------------------
+
+
+Let's start with step 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
