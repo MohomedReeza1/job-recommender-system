@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "../styles/EmployerLogin.css";
 
 const EmployerLogin = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -28,12 +30,18 @@ const EmployerLogin = () => {
         }
       }
     );
-      localStorage.setItem("token", response.data.access_token);
+      const userData = {
+        email: formData.email,
+        role: "recruiter",
+        token: response.data.access_token
+      };
+
+      login(userData);
       alert("Login successful!");
       navigate("/my-posted-jobs");
     } catch (error) {
       console.error("Login error:", error);
-      alert("Invalid email or password.");
+      alert(error.response?.data?.detail || "Invalid email or password.");
     }
   };
 

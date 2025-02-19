@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import "../styles/JobSeekerLogin.css";
+import { useAuth } from "../context/AuthContext"; 
 
 const JobSeekerLogin = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -28,7 +30,16 @@ const JobSeekerLogin = () => {
         }
       }
     );
-      localStorage.setItem("token", response.data.access_token);
+      // localStorage.setItem("token", response.data.access_token);
+
+      const userData = {
+        email: formData.email,
+        role: "job_seeker",  // ✅ Store role
+        token: response.data.access_token
+      };
+
+      login(userData);
+
       alert("Login successful!");
       navigate("/jobs");
     } catch (error) {
