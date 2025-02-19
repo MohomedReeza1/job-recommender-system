@@ -19,14 +19,19 @@ const JobSeekerSignup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/auth/register", { ...formData, role: "job_seeker" });
+      await api.post("/auth/register", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: "job_seeker",
+      });
       alert("Account created successfully!");
       navigate("/login");
     } catch (error) {
       console.error("Signup error:", error);
-      alert("Failed to create account.");
+      alert(error.response?.data?.detail || "Failed to create account.");
     }
-  };
+  };  
 
   return (
     <div className="signup-container">

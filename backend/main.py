@@ -10,7 +10,8 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 # Include routers
-app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+# app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(jobs.router, prefix="/api", tags=["Jobs"])
 app.include_router(seekers.router, prefix="/api", tags=["Job Seekers"])
 app.include_router(recommendations.router, prefix="/api", tags=["Recommendations"])

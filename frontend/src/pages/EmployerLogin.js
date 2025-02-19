@@ -18,7 +18,16 @@ const EmployerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post("/auth/login", formData);
+      const response = await api.post("/auth/login", new URLSearchParams({
+        username: formData.email,
+        password: formData.password,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      }
+    );
       localStorage.setItem("token", response.data.access_token);
       alert("Login successful!");
       navigate("/my-posted-jobs");

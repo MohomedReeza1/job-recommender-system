@@ -18,13 +18,22 @@ const JobSeekerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post("/auth/login", formData);
+      const response = await api.post("/auth/login", new URLSearchParams({
+        username: formData.email,
+        password: formData.password,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      }
+    );
       localStorage.setItem("token", response.data.access_token);
       alert("Login successful!");
       navigate("/jobs");
     } catch (error) {
       console.error("Login error:", error);
-      alert("Invalid email or password.");
+      alert(error.response?.data?.detail || "Invalid email or password.");
     }
   };
 

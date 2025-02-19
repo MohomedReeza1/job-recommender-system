@@ -2820,6 +2820,8 @@ VALUES (1, 'Al Akeem', 'Kurunegala', '1435', 'admin@alakeem.com', 1, NOW());
 1. JOB SEEKER
 reez@example.com - test123
 johndoe@example.com - test1234
+test@example.com - test123
+hazzam@example.com - test123
 
 2. RECRUITER
 user@alakeem.com - test123
@@ -2909,12 +2911,6 @@ PHASE 3 ERRORS
 
 
 Let's start with step 2
-
-
-
-
-
-
 
 
 

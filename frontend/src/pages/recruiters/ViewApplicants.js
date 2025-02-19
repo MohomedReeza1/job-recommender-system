@@ -1,16 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 // import { api } from "../services/api";
 
 const ViewApplicants = () => {
-
-  useEffect(() => {
-    const fetchViewApplicants = async () => {
-      try {
-      } catch (error) {
-      }
-    };
-    fetchViewApplicants();
-  }, []);
 
   return (
     <div className="container">

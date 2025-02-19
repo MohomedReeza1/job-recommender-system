@@ -6,10 +6,10 @@ import "../styles/EmployerSignup.css";
 const EmployerSignup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    agency_name: "",
+    name: "",
     agency_location: "",
     license_number: "",
-    contact_email: "",
+    email: "",
     password: "",
   });
 
@@ -21,7 +21,12 @@ const EmployerSignup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/auth/register", { ...formData, role: "recruiter" });
+      await api.post("/auth/register", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: "recruiter", 
+      });
       alert("Employer account created successfully!");
       navigate("/employer-login");
     } catch (error) {
@@ -36,7 +41,7 @@ const EmployerSignup = () => {
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          name="agency_name"
+          name="name"
           placeholder="Company Name"
           value={formData.agency_name}
           onChange={handleChange}
@@ -60,7 +65,7 @@ const EmployerSignup = () => {
         />
         <input
           type="email"
-          name="contact_email"
+          name="email"
           placeholder="Work Email"
           value={formData.contact_email}
           onChange={handleChange}

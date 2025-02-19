@@ -1,16 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 // import { api } from "../services/api";
 
 const MyPostedJobs = () => {
-
-  useEffect(() => {
-    const fetchMyPostedJobs = async () => {
-      try {
-      } catch (error) {
-      }
-    };
-    fetchMyPostedJobs();
-  }, []);
 
   return (
     <div className="container">
