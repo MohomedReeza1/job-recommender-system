@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { api } from "../services/api";
+// import { api } from "../services/api";
+import { loginJobSeeker } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import "../styles/JobSeekerLogin.css";
 import { useAuth } from "../context/AuthContext"; 
@@ -17,38 +18,72 @@ const JobSeekerLogin = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const response = await api.post("/auth/login", new URLSearchParams({
+  //       username: formData.email,
+  //       password: formData.password,
+  //     }),
+  //     {
+  //       headers: {
+  //         "Content-Type": "application/x-www-form-urlencoded"
+  //       }
+  //     }
+
+  //   );
+  //     const userData = {
+  //       email: formData.email,
+  //       role: response.data.role,
+  //       user_id: response.data.user_id,
+  //       token: response.data.access_token
+  //     };
+
+  //     if (userData.role !== "job_seeker") {
+  //       alert("You are trying to log in as a job seeker with an employer account.");
+  //       return;
+  //     }
+
+  //     login(userData);
+
+  //     alert("Login successful!");
+  //     navigate("/jobs");
+  //   } catch (error) {
+  //     console.error("Login error:", error);
+  //     alert(error.response?.data?.detail || "Invalid email or password.");
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post("/auth/login", new URLSearchParams({
-        username: formData.email,
-        password: formData.password,
-      }),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
+        // Use the API function instead of direct API call
+        const response = await loginJobSeeker(formData.email, formData.password);
+
+        // Extract user details
+        const userData = {
+            email: formData.email,
+            role: response.role,
+            user_id: response.user_id,
+            token: response.access_token
+        };
+
+        if (userData.role !== "job_seeker") {
+            alert("You are trying to log in as a job seeker with an employer account.");
+            return;
         }
-      }
 
-    );
-      const userData = {
-        email: formData.email,
-        role: response.data.role,
-        token: response.data.access_token
-      };
+        // Store user data in AuthContext and localStorage
+        login(userData);
 
-      if (userData.role !== "job_seeker") {
-        alert("You are trying to log in as a job seeker with an employer account.");
-        return;
-      }
+        // Debugging check
+        console.log("Login successful:", userData);
+        alert("Login successful!");
 
-      login(userData);
-
-      alert("Login successful!");
-      navigate("/jobs");
+        navigate("/jobs");
     } catch (error) {
-      console.error("Login error:", error);
-      alert(error.response?.data?.detail || "Invalid email or password.");
+        console.error("Login error:", error);
+        alert(error.response?.data?.detail || "Invalid email or password.");
     }
   };
 

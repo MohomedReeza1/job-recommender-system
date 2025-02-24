@@ -76,8 +76,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     
-    access_token = create_access_token({"sub": new_user.email, "role": new_user.role})
-    return {"access_token": access_token, "token_type": "bearer", "role": new_user.role}
+    access_token = create_access_token({"sub": new_user.email, "role": new_user.role, "user_id": new_user.id})
+    return {"access_token": access_token, "token_type": "bearer", "role": new_user.role, "user_id": new_user.id}
 
 @router.post("/login", response_model=Token)
 def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
@@ -89,6 +89,6 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
     if requested_role and user.role != requested_role:
         raise HTTPException(status_code=403, detail=f"Unauthorized! This account is a {user.role}")
 
-    access_token = create_access_token({"sub": user.email, "role": user.role})
-    return {"access_token": access_token, "token_type": "bearer", "role": user.role}
+    access_token = create_access_token({"sub": user.email, "role": user.role, "user_id": user.user_id})
+    return {"access_token": access_token, "token_type": "bearer", "role": user.role, "user_id": user.user_id}
 

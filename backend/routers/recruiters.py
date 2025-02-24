@@ -4,6 +4,7 @@ from database import get_db
 from models import RecruitmentAgency, User, Job, AppliedJob, JobSeeker
 from schemas import RecruitmentAgencyCreate, RecruitmentAgencyResponse, JobResponse, AppliedJobResponse
 from routers.auth import require_role
+from routers.auth import get_current_user
 
 router = APIRouter()
 
@@ -82,3 +83,15 @@ def get_job_applicants(job_id: int, db: Session = Depends(get_db)):
         })
     
     return applicants
+
+@router.put("/recruiters/{user_id}")
+def update_recruiter_profile(user_id: int, profile_data: RecruitmentAgencyCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    recruiter = db.query(RecruitmentAgency).filter(RecruitmentAgency.user_id == user_id).first()
+    if not recruiter:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    for key, value in profile_data.dict().items():
+        setattr(recruiter, key, value)
+
+    db.commit()
+    return recruiter

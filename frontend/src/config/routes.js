@@ -6,6 +6,7 @@ const routes = {
   appliedJobs: "/applied-jobs",
   employerSignup: "/employer-signup",
   employerLogin: "/employer-login",
+  recruiterProfile: "/recruiter-profile",
 };
 
 export default routes;

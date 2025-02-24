@@ -6,7 +6,7 @@ from datetime import datetime
 class UserBase(BaseModel):
     name: str
     email: EmailStr
-    role: str  # "job_seeker" or "recruiter"
+    role: str
 
 
 class UserCreate(UserBase):
@@ -137,6 +137,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     role: str
+    user_id: int
 
 
 ############

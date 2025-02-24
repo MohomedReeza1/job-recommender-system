@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000/api";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -53,7 +53,8 @@ export const fetchAppliedJobs = async (seekerId) => {
 
 export const loginJobSeeker = async (email, password) => {
   try {
-    const response = await axios.post("/auth/login", new URLSearchParams({ 
+    // const response = await axios.post("/auth/login", new URLSearchParams({ 
+    const response = await api.post("/auth/login", new URLSearchParams({ 
       username: email, password, scope: "job_seeker" }),
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
@@ -67,7 +68,7 @@ export const loginJobSeeker = async (email, password) => {
 
 export const loginEmployer = async (email, password) => {
   try {
-    const response = await axios.post("/auth/login", new URLSearchParams({
+    const response = await api.post("/auth/login", new URLSearchParams({
       username: email, password, scope: "recruiter" }),
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
@@ -78,15 +79,27 @@ export const loginEmployer = async (email, password) => {
   }
 };
 
+
+
 /////////////
 
 // ✅ Fetch Job Seeker Profile
 export const fetchJobSeekerProfile = async (userId) => {
   const token = localStorage.getItem("token");
-  const response = await api.get(`/seekers/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
+  if (!token) {
+      console.error("fetchJobSeekerProfile: No auth token found!");
+      throw new Error("Unauthorized: No token available.");
+  }
+
+  try {
+      const response = await api.get(`/seekers/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+  } catch (error) {
+      console.error("Error fetching job seeker profile:", error.response?.data || error.message);
+      throw error;
+  }
 };
 
 
@@ -98,19 +111,41 @@ export const createJobSeekerProfile = async (userId, profileData) => {
   return response.data;
 };
 
-// ✅ Update Job Seeker Profile
-// export const updateJobSeekerProfile = async (seekerId, updatedData) => {
-//   try {
-//     const response = await api.put(`/seekers/${seekerId}`, updatedData);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error updating job seeker profile:", error);
-//     throw error;
-//   }
-// };
 export const updateJobSeekerProfile = async (userId, profileData) => {
   const token = localStorage.getItem("token");
-  const response = await api.put(`${API_BASE_URL}/seekers/${userId}`, profileData, {
+  const response = await api.put(`/seekers/${userId}`, profileData, {
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+  });
+  return response.data;
+};
+
+// ✅ Fetch Recruiter Profile
+export const fetchRecruiterProfile = async (userId) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Unauthorized: No token available.");
+
+  try {
+      const response = await api.get(`/recruiters/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+  } catch (error) {
+      console.error("Error fetching recruiter profile:", error.response?.data || error.message);
+      throw error;
+  }
+};
+
+export const createRecruiterProfile = async (userId, profileData) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.post(`/recruiters/${userId}`, profileData, {
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+  });
+  return response.data;
+};
+
+export const updateRecruiterProfile = async (userId, profileData) => {
+  const token = localStorage.getItem("token");
+  const response = await api.put(`/recruiters/${userId}`, profileData, {
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
   });
   return response.data;

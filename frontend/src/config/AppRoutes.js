@@ -11,6 +11,7 @@ import JobSeekerLogin from "../pages/JobSeekerLogin";
 import MyPostedJobs from "../pages/recruiters/MyPostedJobs";
 import PostJob from "../pages/recruiters/PostJob";
 import ViewApplicants from "../pages/recruiters/ViewApplicants";
+import RecruiterProfilePage from "../pages/RecruiterProfilePage";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -25,7 +26,7 @@ const AppRoutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/jobs" element={<JobsPage />} />
       <Route path="/recommendations" element={<RecommendationsPage />} />
-      <Route path="/profile" element={<PrivateRoute element={<ProfilePage />} allowedRoles={["job_seeker", "recruiter"]} />} />
+      <Route path="/profile" element={<PrivateRoute element={<ProfilePage />} allowedRoles={["job_seeker"]} />} />
       <Route path="/applied-jobs" element={<PrivateRoute element={<AppliedJobsPage />} allowedRoles={["job_seeker"]} />} />
       <Route path="/employer-signup" element={<EmployerSignup />} />
       <Route path="/employer-login" element={<EmployerLogin />} />
@@ -34,6 +35,7 @@ const AppRoutes = () => {
       <Route path="/my-posted-jobs" element={<PrivateRoute element={<MyPostedJobs />} allowedRoles={["recruiter"]} />} />
       <Route path="/post-job" element={<PrivateRoute element={<PostJob />} allowedRoles={["recruiter"]} />} />
       <Route path="/view-applicants" element={<PrivateRoute element={<ViewApplicants />} allowedRoles={["recruiter"]} />} />
+      <Route path="/recruiter-profile" element={<PrivateRoute element={<RecruiterProfilePage />} allowedRoles={["recruiter"]} />} />
     </Routes>
   );
 };

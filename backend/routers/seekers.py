@@ -47,12 +47,12 @@ def get_applied_jobs(seeker_id: int, db: Session = Depends(get_db)):
 
 #################
 
-@router.get("/seekers/{user_id}")
-def get_job_seeker(user_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
-    job_seeker = db.query(JobSeeker).filter(JobSeeker.user_id == user_id).first()
-    if not job_seeker:
-        raise HTTPException(status_code=404, detail="Profile not found")
-    return job_seeker
+@router.get("/seekers/{user_id}", response_model=JobSeekerBase)
+def get_job_seeker_profile(user_id: int, db: Session = Depends(get_db)):
+    seeker = db.query(JobSeeker).filter(JobSeeker.id == user_id).first()
+    if not seeker:
+        raise HTTPException(status_code=404, detail="Job Seeker not found")
+    return seeker
 
 @router.post("/seekers/{user_id}")
 def create_job_seeker_profile(user_id: int, profile_data: JobSeekerCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):

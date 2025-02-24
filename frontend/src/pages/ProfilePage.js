@@ -26,7 +26,8 @@ const ProfilePage = () => {
   });
 
   useEffect(() => {
-    if (!user || !user.userId) {
+    if (!user || !user.user_id) {
+        console.error("ProfilePage: No user ID found.");
         setError("User not found. Please log in.");
         setLoading(false);
         return;
@@ -34,10 +35,13 @@ const ProfilePage = () => {
 
     const loadProfile = async () => {
         try {
-            const response = await fetchJobSeekerProfile(user.userId);
+            console.log(`Fetching profile for user ID: ${user.user_id}`);
+            const response = await fetchJobSeekerProfile(user.user_id);
             if (response) {
                 setProfile(response);
                 setFormData(response);
+            } else {
+              setError("No profile found. You may need to create one.");
             }
         } catch (err) {
             console.error("Error fetching profile:", err);
@@ -58,10 +62,10 @@ const ProfilePage = () => {
       e.preventDefault();
       try {
           if (profile) {
-              await updateJobSeekerProfile(user.userId, formData);
+              await updateJobSeekerProfile(user.user_id, formData);
               alert("Profile updated successfully.");
           } else {
-              await createJobSeekerProfile(user.userId, formData);
+              await createJobSeekerProfile(user.user_id, formData);
               alert("Profile created successfully.");
           }
           setEditMode(false);

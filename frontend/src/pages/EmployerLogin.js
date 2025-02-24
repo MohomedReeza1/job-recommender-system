@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { loginEmployer } from "../services/api";
 import "../styles/EmployerLogin.css";
 
 const EmployerLogin = () => {
@@ -20,20 +20,13 @@ const EmployerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post("/auth/login", new URLSearchParams({
-        username: formData.email,
-        password: formData.password,
-      }),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
-      }
-    );
+      const response = await loginEmployer(formData.email, formData.password);
+
       const userData = {
         email: formData.email,
-        role: response.data.role,
-        token: response.data.access_token
+        role: response.role,
+        user_id: response.user_id,
+        token: response.access_token
       };
 
       if (userData.role !== "recruiter") {

@@ -17,7 +17,6 @@ const Navbar = () => {
         {user ? (
           user.role === "job_seeker" ? (
             <>
-              <li><Link to="/recommendations">Recommendations</Link></li>
               <li><Link to="/applied-jobs">Applied Jobs</Link></li>
               <li><Link to="/profile">Profile</Link></li>
             </>
@@ -26,7 +25,7 @@ const Navbar = () => {
               <li><Link to="/my-posted-jobs">My Posted Jobs</Link></li>
               <li><Link to="/post-job">Post a Job</Link></li>
               <li><Link to="/view-applicants">View Applicants</Link></li>
-              <li><Link to="/profile">Profile</Link></li>
+              <li><Link to="/recruiter-profile">Profile</Link></li>
             </>
           ) : null
         ) : (
