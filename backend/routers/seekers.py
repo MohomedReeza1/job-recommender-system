@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models import JobSeeker, AppliedJob
-from schemas import JobSeekerCreate, JobSeekerResponse
+from schemas import JobSeekerCreate, JobSeekerResponse, JobSeekerBase, JobSeekerUpdate
 from routers.auth import require_role
+from routers.auth import get_current_user
 
 router = APIRouter()
 
@@ -13,7 +14,7 @@ def create_job_seeker(seeker: JobSeekerCreate, db: Session = Depends(get_db)):
     db.add(new_seeker)
     db.commit()
     db.refresh(new_seeker)
-    return new_seeker
+    return new_seekers
 
 @router.post("/apply-job/", dependencies=[Depends(require_role("job_seeker"))])
 def apply_job(seeker_id: int, job_id: int, db: Session = Depends(get_db)):
@@ -43,3 +44,33 @@ def get_applied_jobs(seeker_id: int, db: Session = Depends(get_db)):
         }
         for aj in applied_jobs
     ]
+
+#################
+
+@router.get("/seekers/{user_id}")
+def get_job_seeker(user_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    job_seeker = db.query(JobSeeker).filter(JobSeeker.user_id == user_id).first()
+    if not job_seeker:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return job_seeker
+
+@router.post("/seekers/{user_id}")
+def create_job_seeker_profile(user_id: int, profile_data: JobSeekerCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    existing_profile = db.query(JobSeeker).filter(JobSeeker.user_id == user_id).first()
+    if existing_profile:
+        raise HTTPException(status_code=400, detail="Profile already exists")
+    new_profile = JobSeeker(user_id=user_id, **profile_data.dict())
+    db.add(new_profile)
+    db.commit()
+    db.refresh(new_profile)
+    return new_profile
+
+@router.put("/seekers/{user_id}")
+def update_job_seeker_profile(user_id: int, profile_data: JobSeekerUpdate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    job_seeker = db.query(JobSeeker).filter(JobSeeker.user_id == user_id).first()
+    if not job_seeker:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    for key, value in profile_data.dict().items():
+        setattr(job_seeker, key, value)
+    db.commit()
+    return job_seeker

@@ -12,6 +12,7 @@ const Navbar = () => {
       <ul>
         <li><Link to="/">Home</Link></li>
         <li><Link to="/jobs">Jobs</Link></li>
+        <li><Link to="/recommendations">Recommendations</Link></li>
         
         {user ? (
           user.role === "job_seeker" ? (
@@ -36,7 +37,7 @@ const Navbar = () => {
           </>
         )}
 
-        {user && <li><button onClick={logout}>Logout</button></li>}
+        {user && <li><Link to="/"><button onClick={logout}>Logout</button></Link></li>}
       </ul>
     </nav>
   );

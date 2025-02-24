@@ -29,14 +29,18 @@ const JobSeekerLogin = () => {
           "Content-Type": "application/x-www-form-urlencoded"
         }
       }
-    );
-      // localStorage.setItem("token", response.data.access_token);
 
+    );
       const userData = {
         email: formData.email,
-        role: "job_seeker",  // ✅ Store role
+        role: response.data.role,
         token: response.data.access_token
       };
+
+      if (userData.role !== "job_seeker") {
+        alert("You are trying to log in as a job seeker with an employer account.");
+        return;
+      }
 
       login(userData);
 
@@ -47,6 +51,7 @@ const JobSeekerLogin = () => {
       alert(error.response?.data?.detail || "Invalid email or password.");
     }
   };
+
 
   return (
     <div className="login-container">

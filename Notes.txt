@@ -2634,6 +2634,7 @@ C:\final_year_project\app
 │   │	 ├── jobs.py
 │   │	 ├── recommendations.py	
 │   │	 ├── seekers.py
+│   │	 ├── recruiter.py
 │   │	 ├── auth.py
 │   ├── utils
 │   │	 ├── __pycache__
@@ -2654,10 +2655,17 @@ C:\final_year_project\app
 │   │	 │	  ├── Navbar.js
 │   │	 ├── config
 │   │	 │	  ├── routes.js
+│   │	 │	  ├── AppRoutes.js
+│   │	 ├── context
+│   │	 │	  ├── AuthContext.js
 │   │	 ├── pages
 │   │	 │	  ├── AppliedJobsPage.js
 │   │	 │	  ├── ApplyJobPage.js
+│   │	 │	  ├── EmployerLogin.js
+│   │	 │	  ├── EmployerSignup.js
 │   │	 │	  ├── Home.js
+│   │	 │	  ├── JobSeekerLogin.js
+│   │	 │	  ├── JobSeekerSignup.js
 │   │	 │	  ├── JobsPage.js
 │   │	 │	  ├── ProfilePage.js
 │   │	 │	  ├── RecommendationsPage.js
@@ -2665,9 +2673,13 @@ C:\final_year_project\app
 │   │	 │	  ├── api.js
 │   │	 ├── styles
 │   │	 │	  ├── ApplyJobPages.css
+│   │	 │	  ├── EmployerLogin.css
+│   │	 │	  ├── EmployerSignup.css
 │   │	 │	  ├── Footer.css
 │   │	 │	  ├── Home.css
 │   │	 │	  ├── JobCard.css
+│   │	 │	  ├── JobSeekerLogin.css
+│   │	 │	  ├── JobSeekerSignup.css
 │   │	 │	  ├── JobsPage.css
 │   │	 │	  ├── Navbar.css
 │   │	 │	  ├── RecommendationsPage.css
@@ -2679,16 +2691,12 @@ C:\final_year_project\app
 │   │	 ├── logo.svg
 │   │	 ├── reportWebVitals.js
 │   │	 ├── setupTests.js
-│   │	 ├── 
-│   │	 ├──
 │   ├── .env
 │   ├── .gitignore
 │   ├── freeze
 │   ├── package.json
 │   ├── package-lock.json
 │   ├── README.md
-│   ├── 
-│   ├── 
 └── Notes.txt 
 
 
@@ -2700,6 +2708,35 @@ backend files- jobs.py, recommendations.py, seekers.py, auth.py, ml_models.py, d
 ATTACHED FILES
 (frontend files-  routes.js, AuthContext.js, AppliedJobsPage.js, ApplyJobPage.js, Home.js, JobsPage.js, ProfilePage.js, RecommendationsPage.js, api.js, Navbar.js
 backend files- jobs.py, recommendations.py, seekers.py, auth.py, ml_models.py, database.py, main.py, models.py, schemas.py, recruiters.py) 
+
+
+
+These are my FastAPI api endpoints
+
+Authentication
+POST /api/auth/register - Register User 
+POST /api/auth/login - Login User 
+
+Jobs
+GET /api/jobs/ - Get Jobs
+GET /api/jobs/{job_id} - Get Job Details
+POST /api/post-job/ - Post Job
+
+Job Seekers
+POST /api/seekers/ - Create Job Seeker
+POST /api/apply-job/ - Apply Job
+GET /api/applied-jobs/{seeker_id} - Get Applied Jobs
+
+Recommendations
+GET /api/recommendations/{seeker_id} - Recommend Jobs
+POST /api/recommendations/ - Recommend Jobs
+
+Recruiters
+POST /api/recruiters/ - Create Agency
+GET /api/recruiters/{user_id} - Get Agency Profile
+GET /api/recruiters/{user_id}/my-posted-jobs - Get My Posted Jobs
+GET /api/job-applicants/{job_id}/ - Get Job Applicants
+
 ---------------------------------------------------------------------------------------
 
 📌 Database Schema (PostgreSQL)
@@ -2825,6 +2862,7 @@ hazzam@example.com - test123
 
 2. RECRUITER
 user@alakeem.com - test123
+user@reema.com - test123
 johnwayne@example.com  - test123
 
 ---------------------------------------------------------------------------------------
@@ -2900,7 +2938,8 @@ JOB CREATE
   "recruiter_id": 1
 }
 
-
+JOB SEEKER TABLE FIELDS
+Name,Age,Gender,Height,Weight,Marital Status,Number of Children,Education,Skills,Interests,Previous Jobs,Looking Jobs,Description,Passport Status
 --------------------------------------------------------------------------------------
 
 PHASE 3 ERRORS
@@ -2913,9 +2952,22 @@ PHASE 3 ERRORS
 Let's start with step 2
 
 
-
-
-
+{
+  "name": "test name",
+  "age": 20,
+  "gender": "test gender",
+  "height": 160,
+  "weight": 60,
+  "marital_status": "test marital_status",
+  "num_of_children": 0,
+  "education": "test education",
+  "skills": "test skills",
+  "interests": "test interests",
+  "previous_jobs": "test previous_jobs",
+  "looking_jobs": "test looking_jobs",
+  "description": "test description",
+  "passport_status": "valid"
+}
 
 
 

@@ -77,14 +77,18 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
     
     access_token = create_access_token({"sub": new_user.email, "role": new_user.role})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "role": new_user.role}
 
 @router.post("/login", response_model=Token)
 def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    print("Received login data:", form_data.username, form_data.password)  # Debugging line
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
-    
+
+    requested_role = form_data.scopes[0] if form_data.scopes else None
+    if requested_role and user.role != requested_role:
+        raise HTTPException(status_code=403, detail=f"Unauthorized! This account is a {user.role}")
+
     access_token = create_access_token({"sub": user.email, "role": user.role})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "role": user.role}
+

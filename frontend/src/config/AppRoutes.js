@@ -24,7 +24,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/jobs" element={<JobsPage />} />
-      <Route path="/recommendations" element={<PrivateRoute element={<RecommendationsPage />} allowedRoles={["job_seeker"]} />} />
+      <Route path="/recommendations" element={<RecommendationsPage />} />
       <Route path="/profile" element={<PrivateRoute element={<ProfilePage />} allowedRoles={["job_seeker", "recruiter"]} />} />
       <Route path="/applied-jobs" element={<PrivateRoute element={<AppliedJobsPage />} allowedRoles={["job_seeker"]} />} />
       <Route path="/employer-signup" element={<EmployerSignup />} />

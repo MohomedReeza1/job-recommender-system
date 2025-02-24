@@ -136,3 +136,26 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    role: str
+
+
+############
+
+class JobSeekerUpdate(BaseModel):
+    name: Optional[str] = None
+    age: Optional[int] = None
+    gender: Optional[str] = None
+    height: Optional[float] = None
+    weight: Optional[float] = None
+    marital_status: Optional[str] = None
+    num_of_children: Optional[int] = None
+    education: Optional[str] = None
+    skills: Optional[str] = None
+    interests: Optional[str] = None
+    previous_jobs: Optional[str] = None
+    looking_jobs: Optional[str] = None
+    description: Optional[str] = None
+    passport_status: Optional[str] = None
+
+    class Config:
+        from_attributes = True

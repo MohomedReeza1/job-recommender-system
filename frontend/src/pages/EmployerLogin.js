@@ -32,9 +32,14 @@ const EmployerLogin = () => {
     );
       const userData = {
         email: formData.email,
-        role: "recruiter",
+        role: response.data.role,
         token: response.data.access_token
       };
+
+      if (userData.role !== "recruiter") {
+        alert("You are trying to log in as an employer with a job seeker account.");
+        return;
+      }
 
       login(userData);
       alert("Login successful!");
