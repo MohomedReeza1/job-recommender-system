@@ -8,14 +8,6 @@ from routers.auth import get_current_user
 
 router = APIRouter()
 
-@router.post("/seekers/", response_model=JobSeekerResponse, dependencies=[Depends(require_role("job_seeker"))])
-def create_job_seeker(seeker: JobSeekerCreate, db: Session = Depends(get_db)):
-    new_seeker = JobSeeker(**seeker.dict())
-    db.add(new_seeker)
-    db.commit()
-    db.refresh(new_seeker)
-    return new_seekers
-
 @router.post("/apply-job/", dependencies=[Depends(require_role("job_seeker"))])
 def apply_job(seeker_id: int, job_id: int, db: Session = Depends(get_db)):
     if db.query(AppliedJob).filter_by(seeker_id=seeker_id, job_id=job_id).first():
@@ -45,25 +37,31 @@ def get_applied_jobs(seeker_id: int, db: Session = Depends(get_db)):
         for aj in applied_jobs
     ]
 
-#################
 
 @router.get("/seekers/{user_id}", response_model=JobSeekerBase)
 def get_job_seeker_profile(user_id: int, db: Session = Depends(get_db)):
-    seeker = db.query(JobSeeker).filter(JobSeeker.id == user_id).first()
+    seeker = db.query(JobSeeker).filter(JobSeeker.user_id == user_id).first()
     if not seeker:
         raise HTTPException(status_code=404, detail="Job Seeker not found")
     return seeker
 
-@router.post("/seekers/{user_id}")
-def create_job_seeker_profile(user_id: int, profile_data: JobSeekerCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
-    existing_profile = db.query(JobSeeker).filter(JobSeeker.user_id == user_id).first()
-    if existing_profile:
-        raise HTTPException(status_code=400, detail="Profile already exists")
-    new_profile = JobSeeker(user_id=user_id, **profile_data.dict())
-    db.add(new_profile)
+
+@router.post("/seekers/", response_model=JobSeekerResponse, dependencies=[Depends(require_role("job_seeker"))])
+def create_job_seeker(seeker: JobSeekerCreate, db: Session = Depends(get_db)):
+    """
+    Creates a new job seeker profile and links it to the authenticated user.
+    """
+    # Check if a seeker profile already exists for the user_id
+    existing_seeker = db.query(JobSeeker).filter(JobSeeker.user_id == seeker.user_id).first()
+    if existing_seeker:
+        raise HTTPException(status_code=400, detail="Job seeker profile already exists.")
+
+    new_seeker = JobSeeker(user_id=seeker.user_id, **seeker.dict(exclude={"user_id"}))  # Exclude user_id from dict
+    db.add(new_seeker)
     db.commit()
-    db.refresh(new_profile)
-    return new_profile
+    db.refresh(new_seeker)
+    return new_seeker
+
 
 @router.put("/seekers/{user_id}")
 def update_job_seeker_profile(user_id: int, profile_data: JobSeekerUpdate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):

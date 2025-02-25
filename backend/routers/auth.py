@@ -76,8 +76,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     
-    access_token = create_access_token({"sub": new_user.email, "role": new_user.role, "user_id": new_user.id})
-    return {"access_token": access_token, "token_type": "bearer", "role": new_user.role, "user_id": new_user.id}
+    access_token = create_access_token({"sub": new_user.email, "role": new_user.role, "user_id": new_user.user_id})
+    return {"access_token": access_token, "token_type": "bearer", "role": new_user.role, "user_id": new_user.user_id}
 
 @router.post("/login", response_model=Token)
 def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):

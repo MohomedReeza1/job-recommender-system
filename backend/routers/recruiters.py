@@ -8,29 +8,6 @@ from routers.auth import get_current_user
 
 router = APIRouter()
 
-@router.post("/recruiters/", response_model=RecruitmentAgencyResponse, dependencies=[Depends(require_role("recruiter"))])
-def create_agency(agency: RecruitmentAgencyCreate, db: Session = Depends(get_db)):
-    """
-    Allows recruiters to create their agency profile.
-    """
-    if not agency.agency_location:
-        raise HTTPException(status_code=400, detail="Agency location is required.")
-    
-    existing_agency = db.query(RecruitmentAgency).filter(
-        (RecruitmentAgency.license_number == agency.license_number) |
-        (RecruitmentAgency.contact_email == agency.contact_email)
-    ).first()
-    
-    if existing_agency:
-        raise HTTPException(status_code=400, detail="License number or contact email already in use.")
-    
-    new_agency = RecruitmentAgency(**agency.dict())
-    db.add(new_agency)
-    db.commit()
-    db.refresh(new_agency)
-    
-    return new_agency
-
 @router.get("/recruiters/{user_id}", response_model=RecruitmentAgencyResponse, dependencies=[Depends(require_role("recruiter"))])
 def get_agency_profile(user_id: int, db: Session = Depends(get_db)):
     """
@@ -84,14 +61,35 @@ def get_job_applicants(job_id: int, db: Session = Depends(get_db)):
     
     return applicants
 
-@router.put("/recruiters/{user_id}")
+@router.put("/recruiters/{user_id}", response_model=RecruitmentAgencyResponse, dependencies=[Depends(require_role("recruiter"))])
 def update_recruiter_profile(user_id: int, profile_data: RecruitmentAgencyCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    """
+    Updates an existing recruiter's profile.
+    """
     recruiter = db.query(RecruitmentAgency).filter(RecruitmentAgency.user_id == user_id).first()
     if not recruiter:
         raise HTTPException(status_code=404, detail="Profile not found")
 
-    for key, value in profile_data.dict().items():
+    for key, value in profile_data.dict(exclude_unset=True).items():
         setattr(recruiter, key, value)
 
     db.commit()
+    db.refresh(recruiter)
     return recruiter
+
+
+@router.post("/recruiters/", response_model=RecruitmentAgencyResponse, dependencies=[Depends(require_role("recruiter"))])
+def create_recruiter_profile(recruiter: RecruitmentAgencyCreate, db: Session = Depends(get_db)):
+    """
+    Creates a new recruiter profile and links it to the authenticated user.
+    """
+    # Ensure a recruiter profile does not already exist for the user
+    existing_recruiter = db.query(RecruitmentAgency).filter(RecruitmentAgency.user_id == recruiter.user_id).first()
+    if existing_recruiter:
+        raise HTTPException(status_code=400, detail="Recruiter profile already exists.")
+
+    new_recruiter = RecruitmentAgency(**recruiter.dict())
+    db.add(new_recruiter)
+    db.commit()
+    db.refresh(new_recruiter)
+    return new_recruiter

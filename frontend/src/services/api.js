@@ -53,7 +53,6 @@ export const fetchAppliedJobs = async (seekerId) => {
 
 export const loginJobSeeker = async (email, password) => {
   try {
-    // const response = await axios.post("/auth/login", new URLSearchParams({ 
     const response = await api.post("/auth/login", new URLSearchParams({ 
       username: email, password, scope: "job_seeker" }),
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
@@ -80,9 +79,6 @@ export const loginEmployer = async (email, password) => {
 };
 
 
-
-/////////////
-
 // ✅ Fetch Job Seeker Profile
 export const fetchJobSeekerProfile = async (userId) => {
   const token = localStorage.getItem("token");
@@ -103,13 +99,17 @@ export const fetchJobSeekerProfile = async (userId) => {
 };
 
 
-export const createJobSeekerProfile = async (userId, profileData) => {
+export const createJobSeekerProfile = async (profileData) => {
   const token = localStorage.getItem("token");
-  const response = await axios.post(`/seekers/${userId}`, profileData, {
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+  const response = await api.post("/seekers/", profileData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
   });
   return response.data;
 };
+
 
 export const updateJobSeekerProfile = async (userId, profileData) => {
   const token = localStorage.getItem("token");
@@ -119,34 +119,24 @@ export const updateJobSeekerProfile = async (userId, profileData) => {
   return response.data;
 };
 
-// ✅ Fetch Recruiter Profile
 export const fetchRecruiterProfile = async (userId) => {
   const token = localStorage.getItem("token");
-  if (!token) throw new Error("Unauthorized: No token available.");
-
-  try {
-      const response = await api.get(`/recruiters/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-  } catch (error) {
-      console.error("Error fetching recruiter profile:", error.response?.data || error.message);
-      throw error;
-  }
+  return api.get(`/recruiters/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then(res => res.data);
 };
 
-export const createRecruiterProfile = async (userId, profileData) => {
+export const createRecruiterProfile = async (profileData) => {
   const token = localStorage.getItem("token");
-  const response = await axios.post(`/recruiters/${userId}`, profileData, {
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-  });
-  return response.data;
+  return api.post("/recruiters/", JSON.stringify(profileData), {
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+  }).then(res => res.data);
 };
 
 export const updateRecruiterProfile = async (userId, profileData) => {
   const token = localStorage.getItem("token");
-  const response = await api.put(`/recruiters/${userId}`, profileData, {
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-  });
-  return response.data;
+  return api.put(`/recruiters/${userId}`, profileData, {
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+  }).then(res => res.data);
 };
+

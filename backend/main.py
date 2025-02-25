@@ -25,8 +25,3 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # Allow all headers (e.g., Content-Type)
 )
-
-
-# @app.get("/")
-# def root():
-#     return {"message": "Welcome to the Job Recommendation API!"}

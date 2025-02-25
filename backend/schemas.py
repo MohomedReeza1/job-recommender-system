@@ -140,8 +140,6 @@ class Token(BaseModel):
     user_id: int
 
 
-############
-
 class JobSeekerUpdate(BaseModel):
     name: Optional[str] = None
     age: Optional[int] = None
