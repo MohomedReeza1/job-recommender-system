@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import axios from "axios";
-import '../styles/ApplyJobPages.css';
+import axios from "axios"; 
+import '../styles/ApplyJobPage.css';
 
 const ApplyJobPage = () => {
   const { jobId } = useParams();
@@ -126,6 +126,8 @@ const ApplyJobPage = () => {
         <p><strong>Country:</strong> {jobDetails.country}</p>
         <p><strong>Skills Required:</strong> {jobDetails.skills_required}</p>
         {jobDetails.salary && <p><strong>Salary:</strong> {jobDetails.salary}</p>}
+        {jobDetails.working_hours && <p><strong>Working Hours:</strong> {jobDetails.working_hours}</p>}
+        {jobDetails.facilities && <p><strong>Facilities:</strong> {jobDetails.facilities}</p>}
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -165,3 +167,4 @@ const ApplyJobPage = () => {
 };
 
 export default ApplyJobPage;
+

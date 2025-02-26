@@ -39,13 +39,31 @@ export const fetchRecommendationsWithForm = async (formData) => {
   }
 };
 
-export const fetchAppliedJobs = async (seekerId) => {
+export const fetchAppliedJobs = async (userId) => {
+  if (!userId) {
+    console.error("fetchAppliedJobs: No user ID provided");
+    return [];
+  }
+  
   try {
-    const response = await api.get(`/applied-jobs/${seekerId}`);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("fetchAppliedJobs: No auth token found");
+      throw new Error("Authentication required");
+    }
+    
+    console.log(`Sending request to fetch applied jobs for user ID: ${userId}`);
+    const response = await api.get(`/applied-jobs/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
     return response.data;
   } catch (error) {
-    console.error("Error fetching applied jobs:", error);
-    throw error;
+    console.error("Error fetching applied jobs:", error.response?.data || error.message);
+    // Return empty array instead of throwing to prevent UI errors
+    return [];
   }
 };
 

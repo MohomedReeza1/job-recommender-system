@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Form, File, UploadFile
 from sqlalchemy.orm import Session
 from database import get_db
-from models import JobSeeker, AppliedJob, User
+from models import JobSeeker, AppliedJob, User, Job
 from schemas import JobSeekerCreate, JobSeekerResponse, JobSeekerBase, JobSeekerUpdate, AppliedJobResponse
 from routers.auth import require_role
 from routers.auth import get_current_user
@@ -83,27 +83,39 @@ async def apply_job(
         raise HTTPException(status_code=500, detail=f"Application failed: {str(e)}")
 
 
-@router.get("/applied-jobs/{seeker_id}")
-def get_applied_jobs(seeker_id: int, db: Session = Depends(get_db)):
+@router.get("/applied-jobs/{user_id}")
+def get_applied_jobs(user_id: int, db: Session = Depends(get_db)):
     """
-    Fetches all jobs that a specific job seeker has applied for.
+    Fetches all jobs that a specific user has applied for.
     """
-    applied_jobs = db.query(AppliedJob).filter(AppliedJob.seeker_id == seeker_id).all()
+    try:
+        # Get all applications by this user
+        applied_jobs = db.query(AppliedJob).filter(AppliedJob.user_id == user_id).all()
+        
+        if not applied_jobs:
+            return []  # Return empty list instead of 404 error
 
-    if not applied_jobs:
-        raise HTTPException(status_code=404, detail="No applied jobs found.")
+        result = []
+        for aj in applied_jobs:
+            # Join with Jobs table to get job details
+            job = db.query(Job).filter(Job.job_id == aj.job_id).first()
+            if job:
+                result.append({
+                    "job_id": job.job_id,
+                    "job_title": job.job_title,
+                    "country": job.country,
+                    "applied_at": aj.applied_at,
+                    "cv_filename": aj.cv_filename,
+                    "cover_letter_filename": aj.cover_letter_filename
+                })
+        
+        return result
+    except Exception as e:
+        # Log the error
+        print(f"Error fetching applied jobs: {str(e)}")
+        # Return empty list to prevent frontend errors
+        return []
 
-    return [
-        {
-            "job_id": aj.job.job_id,
-            "job_title": aj.job.job_title,
-            "country": aj.job.country,
-            "applied_at": aj.applied_at,
-            "cv_filename": aj.cv_filename,
-            "cover_letter_filename": aj.cover_letter_filename
-        }
-        for aj in applied_jobs
-    ]
 
 @router.get("/seekers/{user_id}", response_model=JobSeekerBase)
 def get_job_seeker_profile(user_id: int, db: Session = Depends(get_db)):

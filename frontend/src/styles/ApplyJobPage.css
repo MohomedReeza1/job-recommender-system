@@ -1,0 +1,160 @@
+.apply-job-page {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.apply-job-page h2 {
+  color: #007bff;
+  text-align: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #eaeaea;
+  font-size: 1.8rem;
+}
+
+.job-details {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.job-details p {
+  margin-bottom: 12px;
+}
+
+.job-details strong {
+  color: #495057;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.file-upload {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px dashed #ced4da;
+  transition: all 0.3s ease;
+}
+
+.file-upload:hover {
+  border-color: #007bff;
+  background: #f0f7ff;
+}
+
+.file-upload label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.file-upload input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  background: white;
+}
+
+.file-name {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #28a745;
+  font-weight: 500;
+}
+
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 14px 25px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-weight: 600;
+  margin-top: 10px;
+  width: 100%;
+}
+
+button:hover {
+  background: #0069d9;
+}
+
+button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+button.loading {
+  position: relative;
+  background: #007bff;
+  color: transparent;
+}
+
+button.loading::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error, .loading {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.error h2 {
+  color: #dc3545;
+}
+
+.error button {
+  background: #dc3545;
+  width: auto;
+  margin: 20px auto 0;
+  display: block;
+  padding: 10px 20px;
+}
+
+.error button:hover {
+  background: #c82333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .apply-job-page {
+    padding: 20px;
+    margin: 20px;
+  }
+  
+  .job-details {
+    padding: 15px;
+  }
+  
+  button {
+    padding: 12px 20px;
+  }
+}

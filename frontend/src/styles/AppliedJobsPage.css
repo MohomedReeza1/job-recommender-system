@@ -1,0 +1,88 @@
+.applied-jobs-page {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+  }
+  
+  .applied-jobs-page h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+  }
+  
+  .applied-jobs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .applied-job-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: transform 0.2s ease;
+  }
+  
+  .applied-job-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .applied-job-card h3 {
+    color: #007bff;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+  }
+  
+  .job-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .application-documents {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  .download-link {
+    display: inline-block;
+    padding: 8px 15px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+  
+  .download-link:hover {
+    background: #0056b3;
+  }
+  
+  .loading, .error, .empty {
+    text-align: center;
+    padding: 50px 20px;
+  }
+  
+  .no-jobs-message {
+    margin-bottom: 20px;
+    color: #666;
+  }
+  
+  .browse-jobs-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  
+  .browse-jobs-btn:hover {
+    background: #0056b3;
+  }
