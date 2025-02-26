@@ -10,7 +10,6 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 # Include routers
-# app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(jobs.router, prefix="/api", tags=["Jobs"])
 app.include_router(seekers.router, prefix="/api", tags=["Job Seekers"])
@@ -20,8 +19,8 @@ app.include_router(recruiters.router, prefix="/api", tags=["Recruiters"])
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React app origin
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers (e.g., Content-Type)
+    allow_methods=["*"],
+    allow_headers=["*"],
 )

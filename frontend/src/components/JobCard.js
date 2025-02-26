@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 const JobCard = ({ job, isFromRecommendations }) => {
   const navigate = useNavigate();
 
-  const handleApplyNow = () => {
+  const handleViewJob = () => {
     navigate(`/apply-job/${job.job_id}`, {
       state: { isFromRecommendations },
     });
@@ -29,7 +29,7 @@ const JobCard = ({ job, isFromRecommendations }) => {
     <div className="job-card">
       <h3>{job.job_title}</h3>
       <p>{job.job_description}</p>
-      <button onClick={handleApplyNow}>Apply Now</button>
+      <button onClick={handleViewJob}>View Job</button>
     </div>
   );
 };

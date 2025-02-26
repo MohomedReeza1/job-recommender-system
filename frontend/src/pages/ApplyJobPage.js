@@ -1,70 +1,165 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { api } from "../services/api";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 import '../styles/ApplyJobPages.css';
 
-const ApplyJobPage = ({ isFromRecommendations }) => {
+const ApplyJobPage = () => {
   const { jobId } = useParams();
-  const [jobDetails, setJobDetails] = useState(null);
-  const [formData, setFormData] = useState({});
   const navigate = useNavigate();
+  const [jobDetails, setJobDetails] = useState(null);
+  const [cvFile, setCvFile] = useState(null);
+  const [coverLetterFile, setCoverLetterFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Fetch job details when component mounts
     const fetchJobDetails = async () => {
       try {
-        const response = await api.get(`/jobs/${jobId}`);
+        const response = await axios.get(`http://127.0.0.1:8000/api/jobs/${jobId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
         setJobDetails(response.data);
-      } catch (error) {
-        console.error("Error fetching job details:", error);
+      } catch (err) {
+        setError("Failed to load job details. Please try again later.");
       }
     };
 
     fetchJobDetails();
   }, [jobId]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, name: value });
-  };
-
-  const handleApply = async () => {
-    try {
-      await api.post("/apply-job/", {
-        seeker_id: 1, // Use the actual user ID
-        job_id: jobId,
-      });
-      alert("Applied successfully!");
-      navigate("/applied-jobs");
-    } catch (error) {
-      console.error("Error applying for job:", error);
-      alert("Failed to apply.");
+  // Handle file selection for CV
+  const handleCvChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setCvFile(e.target.files[0]);
     }
   };
 
+  // Handle file selection for Cover Letter
+  const handleCoverLetterChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setCoverLetterFile(e.target.files[0]);
+    }
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!cvFile) {
+      alert("Please upload your CV before applying.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Get token and decode user info
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("You must be logged in to apply for jobs");
+      }
+      
+      const decoded = jwtDecode(token);
+      const userId = decoded.user_id;
+      
+      // Create a FormData object
+      const formData = new FormData();
+      formData.append("user_id", userId);
+      formData.append("job_id", jobId);
+      formData.append("cv", cvFile);
+      
+      if (coverLetterFile) {
+        formData.append("cover_letter", coverLetterFile);
+      }
+      
+      // Make the API request
+      await axios.post(
+        "http://127.0.0.1:8000/api/apply-job/", 
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      alert("Application submitted successfully!");
+      navigate("/applied-jobs");
+      
+    } catch (err) {
+      const errorMessage = err.response?.data?.detail || 
+                          err.message || 
+                          "Failed to submit application. Please try again.";
+      
+      setError(errorMessage);
+      alert(`Error: ${errorMessage}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="apply-job-page error">
+        <h2>Error</h2>
+        <p>{error}</p>
+        <button onClick={() => navigate("/jobs")}>Back to Jobs</button>
+      </div>
+    );
+  }
+
+  if (!jobDetails) {
+    return <div className="apply-job-page loading">Loading job details...</div>;
+  }
+
   return (
     <div className="apply-job-page">
-      {jobDetails && (
-        <>
-          <h2>{jobDetails.job_title}</h2>
-          <p>{jobDetails.job_description}</p>
-          <p>Country: {jobDetails.country}</p>
-          <p>Skills Required: {jobDetails.skills_required}</p>
-          <p>Salary: {jobDetails.salary}</p>
-          {!isFromRecommendations && (
-            <div>
-              <h3>Enter Your Details</h3>
-              <input
-                type="text"
-                placeholder="Name"
-                name="name"
-                onChange={handleChange}
-              />
-              {/* Add other fields as required */}
-            </div>
-          )}
-          <button onClick={handleApply}>Confirm Apply</button>
-        </>
-      )}
+      <h2>{jobDetails.job_title}</h2>
+      
+      <div className="job-details">
+        <p><strong>Description:</strong> {jobDetails.job_description}</p>
+        <p><strong>Country:</strong> {jobDetails.country}</p>
+        <p><strong>Skills Required:</strong> {jobDetails.skills_required}</p>
+        {jobDetails.salary && <p><strong>Salary:</strong> {jobDetails.salary}</p>}
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <div className="file-upload">
+          <label htmlFor="cv-upload">Upload CV (Required):</label>
+          <input 
+            id="cv-upload"
+            type="file" 
+            accept=".pdf,.docx,.doc" 
+            onChange={handleCvChange}
+            required
+          />
+          {cvFile && <p className="file-name">Selected: {cvFile.name}</p>}
+        </div>
+
+        <div className="file-upload">
+          <label htmlFor="cover-letter-upload">Upload Cover Letter (Optional):</label>
+          <input 
+            id="cover-letter-upload"
+            type="file" 
+            accept=".pdf,.docx,.doc" 
+            onChange={handleCoverLetterChange}
+          />
+          {coverLetterFile && <p className="file-name">Selected: {coverLetterFile.name}</p>}
+        </div>
+
+        <button 
+          type="submit" 
+          disabled={loading}
+          className={loading ? "loading" : ""}
+        >
+          {loading ? "Submitting..." : "Apply Now"}
+        </button>
+      </form>
     </div>
   );
 };

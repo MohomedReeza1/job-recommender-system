@@ -9,7 +9,6 @@ export const api = axios.create({
   },
 });
 
-// Example: Fetch jobs
 export const fetchJobs = async () => {
   try {
     const response = await api.get("/jobs/");
@@ -20,7 +19,6 @@ export const fetchJobs = async () => {
   }
 };
 
-// Example: Get recommendations
 export const fetchRecommendations = async (userId) => {
   try {
     const response = await api.get(`/recommendations/${userId}`);

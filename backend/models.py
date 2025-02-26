@@ -88,12 +88,14 @@ class AppliedJob(Base):
     __tablename__ = "applied_jobs"
 
     application_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     job_id = Column(Integer, ForeignKey("jobs.job_id", ondelete="CASCADE"), nullable=False)
-    seeker_id = Column(Integer, ForeignKey("job_seekers.seeker_id", ondelete="CASCADE"), nullable=False)
+    cv_filename = Column(String(255), nullable=True)
+    cover_letter_filename = Column(String(255), nullable=True)
     applied_at = Column(TIMESTAMP, server_default=func.now())
 
     job = relationship("Job")
-    seeker = relationship("JobSeeker")
+
 
 # class UserJobInteraction(Base):
 #     __tablename__ = "user_job_interactions"

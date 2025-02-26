@@ -4,53 +4,38 @@ import { useAuth } from "../context/AuthContext";
 import '../styles/ApplyJobPages.css';
 
 const AppliedJobsPage = () => {
-  const auth = useAuth(); 
-
-  // ✅ Move Hooks to the top level
+  const auth = useAuth();
   const [appliedJobs, setAppliedJobs] = useState([]);
-  const [loading, setLoading] = useState(true); // ✅ Add loading state
-
-  const { user } = auth || {};  // ✅ Ensure auth is not null
-  const seekerId = user?.seeker_id; 
+  const { user } = auth || {};
+  const seekerId = user?.seeker_id;
 
   useEffect(() => {
     const fetchAppliedJobs = async () => {
-      if (!seekerId) {
-        setLoading(false); // Stop loading if no seekerId
-        return;
-      }
-
+      if (!seekerId) return;
       try {
         const response = await api.get(`/applied-jobs/${seekerId}`);
         setAppliedJobs(response.data);
       } catch (error) {
         console.error("Error fetching applied jobs:", error);
-      } finally {
-        setLoading(false); // ✅ Ensure loading stops
       }
     };
-
     fetchAppliedJobs();
-  }, [seekerId]); 
-
-  if (loading) return <p>Loading...</p>; // ✅ Show loading state while fetching
+  }, [seekerId]);
 
   return (
     <div className="applied-jobs-page">
       <h2>Applied Jobs</h2>
-      {appliedJobs.length > 0 ? (
-        <ul>
-          {appliedJobs.map((job) => (
-            <li key={job.job_id}>
-              <h3>{job.job_title}</h3>
-              <p>{job.country}</p>
-              <p>Applied on: {new Date(job.applied_at).toLocaleDateString()}</p>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No jobs applied yet.</p>
-      )}
+      <ul>
+        {appliedJobs.map((job) => (
+          <li key={job.job_id}>
+            <h3>{job.job_title}</h3>
+            <p>{job.country}</p>
+            <p>Applied on: {new Date(job.applied_at).toLocaleDateString()}</p>
+            {job.cv_filename && <p><a href={`/uploads/${job.cv_filename}`} download>Download CV</a></p>}
+            {job.cover_letter_filename && <p><a href={`/uploads/${job.cover_letter_filename}`} download>Download Cover Letter</a></p>}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

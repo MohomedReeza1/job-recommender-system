@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { api, fetchRecommendationsWithForm } from "../services/api";
-import JobCard from "../components/JobCard"; 
+import { fetchRecommendationsWithForm } from "../services/api";
+import JobCard from "../components/JobCard";
 import "../styles/RecommendationsPage.css";
 
 const RecommendationsPage = () => {
@@ -23,34 +23,13 @@ const RecommendationsPage = () => {
 
   const [recommendedJobs, setRecommendedJobs] = useState([]);
   const [showRecommendations, setShowRecommendations] = useState(false);
-  const [dataSaved, setDataSaved] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSaveData = async () => {
-    if (dataSaved) {
-      alert("You have already submitted your data. Click 'Get a New Recommendation' to reset.");
-      return;
-    }
-    try {
-      await api.post("/seekers/", formData); // Save the form data to the database
-      setDataSaved(true);
-      alert("Data saved successfully!");
-    } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Failed to save data. Please try again.");
-    }
-  };
-
-
   const handleGetRecommendations = async () => {
-    if (!dataSaved) {
-      alert("Please save your data before getting recommendations.");
-      return;
-    }
     try {
       const response = await fetchRecommendationsWithForm(formData);
       setRecommendedJobs(response);
@@ -59,7 +38,7 @@ const RecommendationsPage = () => {
       console.error("Error fetching recommendations:", error);
       alert("Failed to get recommendations. Please try again.");
     }
-  };  
+  };
 
   const handleResetForm = () => {
     setFormData({
@@ -80,7 +59,6 @@ const RecommendationsPage = () => {
     });
     setRecommendedJobs([]);
     setShowRecommendations(false);
-    setDataSaved(false);
   };
 
   return (
@@ -240,9 +218,8 @@ const RecommendationsPage = () => {
 
       {/* Buttons */}
       <div className="buttons-container">
-        <button onClick={handleSaveData}>Save Data</button>
         <button onClick={handleGetRecommendations}>Get Recommendation</button>
-        <button onClick={handleResetForm}>Get a New Recommendation</button>
+        <button onClick={handleResetForm}>Reset</button>
       </div>
 
       {/* Recommended Jobs */}

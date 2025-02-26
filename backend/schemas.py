@@ -99,7 +99,10 @@ class JobResponse(JobBase):
 # 5️⃣ Applied Jobs Schema
 class AppliedJobBase(BaseModel):
     job_id: int
-    seeker_id: int
+    # seeker_id: int
+    user_id: int
+    cv_filename: Optional[str] = None
+    cover_letter_filename: Optional[str] = None
 
 class AppliedJobResponse(AppliedJobBase):
     application_id: int

@@ -12,6 +12,7 @@ import MyPostedJobs from "../pages/recruiters/MyPostedJobs";
 import PostJob from "../pages/recruiters/PostJob";
 import ViewApplicants from "../pages/recruiters/ViewApplicants";
 import RecruiterProfilePage from "../pages/RecruiterProfilePage";
+import ApplyJobPage from "../pages/ApplyJobPage";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -28,6 +29,7 @@ const AppRoutes = () => {
       <Route path="/recommendations" element={<RecommendationsPage />} />
       <Route path="/profile" element={<PrivateRoute element={<ProfilePage />} allowedRoles={["job_seeker"]} />} />
       <Route path="/applied-jobs" element={<PrivateRoute element={<AppliedJobsPage />} allowedRoles={["job_seeker"]} />} />
+      <Route path="/apply-job/:jobId"  element={<PrivateRoute element={<ApplyJobPage />} allowedRoles={["job_seeker"]} />} />
       <Route path="/employer-signup" element={<EmployerSignup />} />
       <Route path="/employer-login" element={<EmployerLogin />} />
       <Route path="/signup" element={<JobSeekerSignup />} />
