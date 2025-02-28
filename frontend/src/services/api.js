@@ -135,6 +135,7 @@ export const updateJobSeekerProfile = async (userId, profileData) => {
   return response.data;
 };
 
+// Fetch Recruiter Profile
 export const fetchRecruiterProfile = async (userId) => {
   const token = localStorage.getItem("token");
   return api.get(`/recruiters/${userId}`, {
@@ -154,5 +155,83 @@ export const updateRecruiterProfile = async (userId, profileData) => {
   return api.put(`/recruiters/${userId}`, profileData, {
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
   }).then(res => res.data);
+};
+
+// Fetch Job details to Recruiter Profile
+export const fetchMyPostedJobs = async (userId) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("Authentication required");
+  }
+  try {
+    const response = await api.get(`/recruiters/${userId}/my-posted-jobs`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching posted jobs:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const postJob = async (jobData) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("Authentication required");
+  }
+  try {
+    const response = await api.post("/post-job/", jobData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error posting job:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteJob = async (jobId) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("Authentication required");
+  }
+  try {
+    const response = await api.delete(`/jobs/${jobId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting job:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const fetchJobDetails = async (jobId) => {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await api.get(`/jobs/${jobId}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching job details:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const fetchJobApplicants = async (jobId) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("Authentication required");
+  }
+  try {
+    const response = await api.get(`/job-applicants/${jobId}/`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching job applicants:", error.response?.data || error.message);
+    throw error;
+  }
 };
 

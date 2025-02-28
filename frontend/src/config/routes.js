@@ -8,6 +8,10 @@ const routes = {
   employerSignup: "/employer-signup",
   employerLogin: "/employer-login",
   recruiterProfile: "/recruiter-profile",
+  myPostedJobs: "/my-posted-jobs",
+  postJob: "/post-job",
+  viewApplicants: "/view-applicants/:jobId",
+  editJob: "/edit-job/:jobId",
 };
 
 export default routes;

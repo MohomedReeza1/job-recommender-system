@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
-from models import Job
+from models import Job, User
 from schemas import JobCreate, JobResponse
 # from auth import require_role
 from routers.auth import require_role
+from routers.auth import get_current_user
 
 router = APIRouter()
 
@@ -27,3 +28,22 @@ def post_job(job: JobCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_job)
     return new_job
+
+@router.delete("/jobs/{job_id}", dependencies=[Depends(require_role("recruiter"))])
+def delete_job(job_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    """
+    Deletes a job posting if the authenticated recruiter is the owner.
+    """
+    job = db.query(Job).filter(Job.job_id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Check if the current recruiter owns this job
+    if job.recruiter_id != current_user.recruiter_profile.agency_id:
+        raise HTTPException(status_code=403, detail="You don't have permission to delete this job")
+    
+    # Delete the job
+    db.delete(job)
+    db.commit()
+    
+    return {"message": "Job deleted successfully"}
