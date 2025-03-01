@@ -57,7 +57,7 @@ class RecruitmentAgency(Base):
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     user = relationship("User", back_populates="recruiter_profile")
-    jobs = relationship("Job", back_populates="recruiter")
+    jobs = relationship("Job", back_populates="agency")
 
 
 # 4️⃣ Jobs Table (Linked to `recruitment_agencies`)
@@ -77,10 +77,10 @@ class Job(Base):
     looking_gender = Column(String(20))
     num_of_job_seekers_required = Column(Integer)
     available_quantity = Column(Integer)
-    recruiter_id = Column(Integer, ForeignKey("recruitment_agencies.agency_id", ondelete="CASCADE"), nullable=False)
+    agency_id = Column(Integer, ForeignKey("recruitment_agencies.agency_id", ondelete="CASCADE"), nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
-    recruiter = relationship("RecruitmentAgency", back_populates="jobs")
+    agency = relationship("RecruitmentAgency", back_populates="jobs")
 
 
 # 5️⃣ Applied Jobs Table (Job Applications)
