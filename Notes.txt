@@ -3035,17 +3035,87 @@ Let me know if you need any clarification or have any specific questions about t
 sorry for asking again, Now i have uploaded my all updated files in Project knowledge. can you again check these finalized code files align with my codes if need any modifications.
 
 
+hi, I have uploaded the modified code files for you.
+
+I need to modify and ensure the "Recommendations" page is correctly working. Earlier it worked properly and gave the job recommendations (from the database) after inserting all the form details and click "get recommendations button". But later I had to truncate the jobs table. I think maybe the issue is coming bcz of that (bcz there are no jobs existing in the database and im getting recommendations). I've shared all the errors that occuring. 
+
+also another thing. Recommendation page is a common page for all users.
+1. in the guest view
+2. logged in job seeker
+3. logged in recruiter
+that means for all users Recommendation page is available for an inquiry about recommended jobs for the users when entering the personal details of the users. This is all common for guest user, logged in job seeker and logged in recruiter. i dont need to save these filled data into database i just need to ask the personal details of the users and output the recommended jobs. 
+
+Before proceeding to modify codes; i have a dataset of 200 jobs list in csv format and  i need a proper guidance to import these data into the jobs table while maintaining the database properly (making sure that auto increment is working properly for all these data). My database is postgreSQL and im managing the database through pgAdmin.
+
+First we'll modify the database and include 200 jobs. After that if we need to do any modifications we'll do after that.
 
 
-There is an issue in the post a new job component. Issue is that when i logged from a user with user id 7 (a recruiter) and trying to post a new job; the job is posted in the jobs table by referencing the recruiter id as 7. (user id 7 and recruiter id as 7 might not be same)
-
-This is the job schema in my schemas.py.
 
 
-
-
-
-
-
-
-
+INFO:     127.0.0.1:47863 - "POST /api/recommendations/ HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 409, in run_asgi    
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\middleware\errors.py", line 187, in __call__
+    raise exc
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\fastapi\routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\starlette\concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\anyio\to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\anyio\_backends\_asyncio.py", line 2461, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\final_year_project\app\backend\env\Lib\site-packages\anyio\_backends\_asyncio.py", line 962, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\final_year_project\app\backend\routers\recommendations.py", line 25, in recommend_jobs
+    recommendations = get_top_recommendations_from_data(seeker_data.dict(), db, top_n=3)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\final_year_project\app\backend\utils\ml_models.py", line 84, in get_top_recommendations_from_data
+    hybrid_scores = (0.5 * similarity_scores_scaled) + (0.5 * collab_scores_scaled)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ValueError: operands could not be broadcast together with shapes (5,) (198,)

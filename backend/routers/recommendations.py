@@ -22,7 +22,10 @@ def recommend_jobs(seeker_data: RecommendationRequest, db: Session = Depends(get
     """
     Fetches job recommendations for a new job seeker based on their input profile.
     """
-    recommendations = get_top_recommendations_from_data(seeker_data.dict(), db, top_n=3)
-    if not recommendations:
-        raise HTTPException(status_code=404, detail="No recommendations found.")
-    return recommendations
+    try:
+        recommendations = get_top_recommendations_from_data(seeker_data.dict(), db, top_n=3)
+        if not recommendations:
+            return []
+        return recommendations
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating recommendations: {str(e)}")

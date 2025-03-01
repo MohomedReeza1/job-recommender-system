@@ -91,7 +91,7 @@ class JobCreate(JobBase):
 
 class JobResponse(JobBase):
     job_id: int
-    created_at: datetime
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
