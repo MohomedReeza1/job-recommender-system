@@ -5,19 +5,34 @@ import '../styles/JobsPage.css';
 
 const JobsPage = () => {
   const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-      const getJobs = async () => {
-          try {
-              const jobsData = await fetchJobs();
-              setJobs(jobsData);
-          } catch (error) {
-              console.error("Error fetching jobs:", error);
-          }
-      };
+    const getJobs = async () => {
+      try {
+        setLoading(true);
+        const jobsData = await fetchJobs();
+        setJobs(jobsData);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+        setError("Failed to load jobs. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
   
-      getJobs();
+    getJobs();
   }, []);
+
+  if (loading) {
+    return <div className="jobs-container loading">Loading available jobs...</div>;
+  }
+
+  if (error) {
+    return <div className="jobs-container error">{error}</div>;
+  }
 
   return (
     <div className="jobs-container">
@@ -29,9 +44,6 @@ const JobsPage = () => {
       </div>
     </div>
   );
-};  
+};
 
 export default JobsPage;
-
-
-

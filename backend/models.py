@@ -42,6 +42,7 @@ class JobSeeker(Base):
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     user = relationship("User", back_populates="job_seeker_profile")
+    applications = relationship("AppliedJob", back_populates="seeker")
 
 
 # 3️⃣ Recruitment Agencies Table (Linked to `users`)
@@ -81,20 +82,21 @@ class Job(Base):
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     agency = relationship("RecruitmentAgency", back_populates="jobs")
-
+    applications = relationship("AppliedJob", back_populates="job")
 
 # 5️⃣ Applied Jobs Table (Job Applications)
 class AppliedJob(Base):
     __tablename__ = "applied_jobs"
 
     application_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
+    seeker_id = Column(Integer, ForeignKey("job_seekers.seeker_id", ondelete="CASCADE"), nullable=False)
     job_id = Column(Integer, ForeignKey("jobs.job_id", ondelete="CASCADE"), nullable=False)
     cv_filename = Column(String(255), nullable=True)
     cover_letter_filename = Column(String(255), nullable=True)
     applied_at = Column(TIMESTAMP, server_default=func.now())
 
-    job = relationship("Job")
+    job = relationship("Job", back_populates="applications")
+    seeker = relationship("JobSeeker", back_populates="applications")
 
 
 # class UserJobInteraction(Base):

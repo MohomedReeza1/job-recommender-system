@@ -22,8 +22,18 @@ def get_job_details(job_id: int, db: Session = Depends(get_db)):
     return job
 
 @router.post("/post-job/", response_model=JobResponse, dependencies=[Depends(require_role("recruiter"))])
-def post_job(job: JobCreate, db: Session = Depends(get_db)):
-    new_job = Job(**job.dict())
+def post_job(job: JobCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    """Post a new job listing."""
+    # Get the agency_id for the current user
+    agency = db.query(RecruitmentAgency).filter(RecruitmentAgency.user_id == current_user.user_id).first()
+    if not agency:
+        raise HTTPException(status_code=404, detail="Recruiter agency profile not found")
+    
+    # Set the recruiter_id to the agency_id
+    job_data = job.dict()
+    job_data["recruiter_id"] = agency.agency_id
+    
+    new_job = Job(**job_data)
     db.add(new_job)
     db.commit()
     db.refresh(new_job)

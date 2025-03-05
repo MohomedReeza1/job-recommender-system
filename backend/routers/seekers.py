@@ -16,7 +16,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     
 @router.post("/apply-job/", response_model=AppliedJobResponse, dependencies=[Depends(require_role("job_seeker"))])
 async def apply_job(
-    user_id: int = Form(...),
     job_id: int = Form(...),
     cv: UploadFile = File(...),
     cover_letter: Optional[UploadFile] = File(None),
@@ -27,9 +26,16 @@ async def apply_job(
     Allows a job seeker to apply for a job with CV and optional cover letter.
     """
     try:
+        # Get the seeker_id for the current user
+        seeker = db.query(JobSeeker).filter(JobSeeker.user_id == current_user.user_id).first()
+        if not seeker:
+            raise HTTPException(status_code=404, detail="Job seeker profile not found")
+        
+        seeker_id = seeker.seeker_id
+        
         # Check if already applied
         existing_application = db.query(AppliedJob).filter(
-            AppliedJob.user_id == user_id,
+            AppliedJob.seeker_id == seeker_id,
             AppliedJob.job_id == job_id
         ).first()
         
@@ -59,7 +65,7 @@ async def apply_job(
         
         # Create and save job application
         new_application = AppliedJob(
-            user_id=user_id,
+            seeker_id=seeker_id,
             job_id=job_id,
             cv_filename=cv_filename,
             cover_letter_filename=cover_letter_filename
@@ -73,7 +79,7 @@ async def apply_job(
         return {
             "application_id": new_application.application_id,
             "job_id": job_id,
-            "user_id": user_id,
+            "seeker_id": seeker_id,
             "cv_filename": cv_filename,
             "cover_letter_filename": cover_letter_filename,
             "applied_at": new_application.applied_at
@@ -82,15 +88,20 @@ async def apply_job(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Application failed: {str(e)}")
 
-
-@router.get("/applied-jobs/{user_id}")
-def get_applied_jobs(user_id: int, db: Session = Depends(get_db)):
+@router.get("/applied-jobs/{seeker_id}")
+def get_applied_jobs(seeker_id: str, db: Session = Depends(get_db)):
     """
-    Fetches all jobs that a specific user has applied for.
+    Fetches all jobs that a specific seeker has applied for.
     """
     try:
-        # Get all applications by this user
-        applied_jobs = db.query(AppliedJob).filter(AppliedJob.user_id == user_id).all()
+        # Convert seeker_id to integer
+        try:
+            seeker_id_int = int(seeker_id)
+        except ValueError:
+            return []  # Return empty list for invalid ID
+            
+        # Get all applications by this seeker
+        applied_jobs = db.query(AppliedJob).filter(AppliedJob.seeker_id == seeker_id_int).all()
         
         if not applied_jobs:
             return []  # Return empty list instead of 404 error
@@ -116,36 +127,120 @@ def get_applied_jobs(user_id: int, db: Session = Depends(get_db)):
         # Return empty list to prevent frontend errors
         return []
 
-
-@router.get("/seekers/{user_id}", response_model=JobSeekerBase)
-def get_job_seeker_profile(user_id: int, db: Session = Depends(get_db)):
-    seeker = db.query(JobSeeker).filter(JobSeeker.user_id == user_id).first()
-    if not seeker:
-        raise HTTPException(status_code=404, detail="Job Seeker not found")
-    return seeker
+@router.get("/seekers/{seeker_id}", response_model=JobSeekerBase)
+def get_job_seeker_profile(seeker_id: str, db: Session = Depends(get_db)):
+    """
+    Fetches a job seeker's profile by ID.
+    Now handles string IDs and converts them to integers.
+    """
+    try:
+        # Convert seeker_id to integer
+        try:
+            seeker_id_int = int(seeker_id)
+        except ValueError:
+            # Return a default empty profile instead of raising an error
+            return JobSeekerBase(
+                name="",
+                age=None,
+                gender="",
+                height=None,
+                weight=None,
+                marital_status="",
+                num_of_children=None,
+                education="",
+                skills="",
+                interests="",
+                previous_jobs="",
+                looking_jobs="",
+                description="",
+                passport_status=""
+            )
+            
+        seeker = db.query(JobSeeker).filter(JobSeeker.seeker_id == seeker_id_int).first()
+        if not seeker:
+            # Return a default empty profile instead of 404
+            return JobSeekerBase(
+                name="",
+                age=None,
+                gender="",
+                height=None,
+                weight=None,
+                marital_status="",
+                num_of_children=None,
+                education="",
+                skills="",
+                interests="",
+                previous_jobs="",
+                looking_jobs="",
+                description="",
+                passport_status=""
+            )
+        return seeker
+    except Exception as e:
+        print(f"Error in get_job_seeker_profile: {str(e)}")
+        # Return a default empty profile
+        return JobSeekerBase(
+            name="",
+            age=None,
+            gender="",
+            height=None,
+            weight=None,
+            marital_status="",
+            num_of_children=None,
+            education="",
+            skills="",
+            interests="",
+            previous_jobs="",
+            looking_jobs="",
+            description="",
+            passport_status=""
+        )
 
 @router.post("/seekers/", response_model=JobSeekerResponse, dependencies=[Depends(require_role("job_seeker"))])
 def create_job_seeker(seeker: JobSeekerCreate, db: Session = Depends(get_db)):
     """
-    Creates a new job seeker profile and links it to the authenticated user.
+    Updates an existing job seeker profile or creates a new one if it doesn't exist.
     """
     # Check if a seeker profile already exists for the user_id
     existing_seeker = db.query(JobSeeker).filter(JobSeeker.user_id == seeker.user_id).first()
+    
     if existing_seeker:
-        raise HTTPException(status_code=400, detail="Job seeker profile already exists.")
+        # Update existing profile
+        for key, value in seeker.dict(exclude={"user_id"}).items():
+            setattr(existing_seeker, key, value)
+        db.commit()
+        db.refresh(existing_seeker)
+        return existing_seeker
+    else:
+        # Create new profile (fallback - should already exist from registration)
+        new_seeker = JobSeeker(user_id=seeker.user_id, **seeker.dict(exclude={"user_id"}))
+        db.add(new_seeker)
+        db.commit()
+        db.refresh(new_seeker)
+        return new_seeker
 
-    new_seeker = JobSeeker(user_id=seeker.user_id, **seeker.dict(exclude={"user_id"}))  # Exclude user_id from dict
-    db.add(new_seeker)
-    db.commit()
-    db.refresh(new_seeker)
-    return new_seeker
-
-@router.put("/seekers/{user_id}")
-def update_job_seeker_profile(user_id: int, profile_data: JobSeekerUpdate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
-    job_seeker = db.query(JobSeeker).filter(JobSeeker.user_id == user_id).first()
-    if not job_seeker:
-        raise HTTPException(status_code=404, detail="Profile not found")
-    for key, value in profile_data.dict().items():
-        setattr(job_seeker, key, value)
-    db.commit()
-    return job_seeker
+@router.put("/seekers/{seeker_id}")
+def update_job_seeker_profile(seeker_id: str, profile_data: JobSeekerUpdate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    try:
+        # Convert seeker_id to integer
+        try:
+            seeker_id_int = int(seeker_id)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid seeker ID format")
+            
+        job_seeker = db.query(JobSeeker).filter(JobSeeker.seeker_id == seeker_id_int).first()
+        if not job_seeker:
+            raise HTTPException(status_code=404, detail="Profile not found")
+        
+        # Verify user is updating their own profile
+        if job_seeker.user_id != current_user.user_id:
+            raise HTTPException(status_code=403, detail="You don't have permission to update this profile")
+        
+        for key, value in profile_data.dict().items():
+            setattr(job_seeker, key, value)
+        db.commit()
+        return job_seeker
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid seeker ID format")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Update failed: {str(e)}")

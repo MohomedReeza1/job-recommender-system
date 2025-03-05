@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { fetchJobSeekerProfile, updateJobSeekerProfile, createJobSeekerProfile } from "../services/api";
+import React, { useEffect, useState, useCallback } from "react";
+import { updateJobSeekerProfile, fetchJobSeekerProfile } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import "../styles/ProfilePage.css";
 import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
-  const { user } = useAuth();
+  const { user, userProfile, updateProfile } = useAuth();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    age: 0,
+    age: "",
     gender: "",
-    height: 0,
-    weight: 0,
+    height: "",
+    weight: "",
     marital_status: "",
-    num_of_children: 0,
+    num_of_children: "",
     education: "",
     skills: "",
     interests: "",
@@ -25,6 +24,41 @@ const ProfilePage = () => {
     description: "",
     passport_status: "",
   });
+  // Store the original form data before editing for cancel functionality
+  const [originalFormData, setOriginalFormData] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [error, setError] = useState(null);
+  const [profileLoaded, setProfileLoaded] = useState(false);
+
+  // Use useCallback to prevent the function from being recreated on every render
+  const loadProfileData = useCallback(async () => {
+    // Skip if already loaded or loading
+    if (profileLoaded || loadingProfile) return;
+    
+    try {
+      setLoadingProfile(true);
+      setError(null);
+      
+      // If userProfile from context is available, use it
+      if (userProfile) {
+        setFormData(userProfile);
+        setProfileLoaded(true);
+      } else {
+        // Otherwise fetch it directly
+        const profile = await fetchJobSeekerProfile();
+        if (profile) {
+          setFormData(profile);
+          updateProfile(profile);
+          setProfileLoaded(true);
+        }
+      }
+    } catch (err) {
+      console.error("Error loading profile:", err);
+      setError("Failed to load profile. Please try again.");
+    } finally {
+      setLoadingProfile(false);
+    }
+  }, [userProfile, updateProfile, profileLoaded, loadingProfile]);
 
   useEffect(() => {
     if (!user) {
@@ -32,22 +66,25 @@ const ProfilePage = () => {
       return;
     }
 
-  const fetchProfile = async () => {
-    try {
-      const response = await fetchJobSeekerProfile(user.user_id);
-      setProfile(response);
-      setFormData(response);
-    } catch (error) {
-      console.error("Error fetching profile data:", error);
+    // Only load profile if not already loaded
+    if (!profileLoaded && !loadingProfile) {
+      loadProfileData();
     }
-  };
-  fetchProfile();
-}, [user, navigate]);
+    
+  }, [user, navigate, loadProfileData, profileLoaded, loadingProfile]);
 
-  const handleEdit = () => setIsEditing(true);
+  const handleEdit = () => {
+    // Save the current form data as original before editing
+    setOriginalFormData({...formData});
+    setIsEditing(true);
+  };
+  
   const handleCancel = () => {
     setIsEditing(false);
-    setFormData(profile || {});
+    // Reset form data to the original data saved before editing
+    if (originalFormData) {
+      setFormData(originalFormData);
+    }
   };
 
   const handleChange = (e) => {
@@ -58,23 +95,37 @@ const ProfilePage = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const payload = { ...formData, user_id: user.user_id };
-  
-      if (profile) {
-        await updateJobSeekerProfile(user.user_id, payload);
-        alert("Profile updated successfully.");
-      } else {
-        await createJobSeekerProfile(payload);
-        alert("Profile created successfully.");
-      }
-  
+      setLoadingProfile(true);
+      const response = await updateJobSeekerProfile(formData);
+      updateProfile(response); // Update the profile in context
       setIsEditing(false);
-      setProfile(payload);
+      // Update the original form data after successful save
+      setOriginalFormData({...response});
+      alert("Profile updated successfully.");
     } catch (err) {
       console.error("Error updating profile:", err);
+      alert("Failed to update profile. Please try again.");
+    } finally {
+      setLoadingProfile(false);
     }
   };
-  
+
+  if (loadingProfile) {
+    return <div className="profile-container">Loading profile...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="profile-container">
+        <h2>Error</h2>
+        <p>{error}</p>
+        <button onClick={() => { 
+          setProfileLoaded(false); 
+          loadProfileData(); 
+        }}>Try Again</button>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-container">
@@ -83,133 +134,147 @@ const ProfilePage = () => {
         <div className="profile-field">
           <strong>Name:</strong>
           {isEditing ? (
-            <input type="text" name="name" value={formData.name} onChange={handleChange} />
+            <input type="text" name="name" value={formData.name || ""} onChange={handleChange} />
           ) : (
-            <span>{profile?.name || "Not Specified"}</span>
+            <span>{formData.name || "Not Specified"}</span>
           )}
         </div>
+
         <div className="profile-field">
           <strong>Age:</strong>
           {isEditing ? (
-            <input type="number" name="age" value={formData.age} onChange={handleChange} />
+            <input type="number" name="age" value={formData.age || ""} onChange={handleChange} />
           ) : (
-            <span>{profile?.age || "Not Specified"}</span>
+            <span>{formData.age || "Not Specified"}</span>
           )}
         </div>
+
         <div className="profile-field">
           <strong>Gender:</strong>
           {isEditing ? (
-            <select name="gender" value={formData.gender} onChange={handleChange}>
+            <select name="gender" value={formData.gender || ""} onChange={handleChange}>
               <option value="">Select</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
           ) : (
-            <span>{profile?.gender || "Not Specified"}</span>
+            <span>{formData.gender || "Not Specified"}</span>
           )}
         </div>
+
         <div className="profile-field">
           <strong>Height:</strong>
           {isEditing ? (
-            <input type="number" name="height" value={formData.height} onChange={handleChange} />
+            <input type="number" name="height" value={formData.height || ""} onChange={handleChange} />
           ) : (
-            <span>{profile?.height || "Not Specified"} cm</span>
+            <span>{formData.height ? `${formData.height} cm` : "Not Specified"}</span>
           )}
         </div>
+
         <div className="profile-field">
           <strong>Weight:</strong>
           {isEditing ? (
-            <input type="number" name="weight" value={formData.weight} onChange={handleChange} />
+            <input type="number" name="weight" value={formData.weight || ""} onChange={handleChange} />
           ) : (
-            <span>{profile?.weight || "Not Specified"} kg</span>
+            <span>{formData.weight ? `${formData.weight} kg` : "Not Specified"}</span>
           )}
         </div>
+
         <div className="profile-field">
           <strong>Marital Status:</strong>
           {isEditing ? (
-            <select name="marital_status" value={formData.marital_status} onChange={handleChange}>
+            <select name="marital_status" value={formData.marital_status || ""} onChange={handleChange}>
               <option value="">Select</option>
               <option value="Single">Single</option>
               <option value="Married">Married</option>
             </select>
           ) : (
-            <span>{profile?.marital_status || "Not Specified"}</span>
+            <span>{formData.marital_status || "Not Specified"}</span>
           )}
         </div>
+
         <div className="profile-field">
           <strong>Number of Children:</strong>
           {isEditing ? (
-            <input type="number" name="num_of_children" value={formData.num_of_children} onChange={handleChange} />
+            <input type="number" name="num_of_children" value={formData.num_of_children || ""} onChange={handleChange} />
           ) : (
-            <span>{profile?.num_of_children || "Not Specified"}</span>
+            <span>{formData.num_of_children !== null ? formData.num_of_children : "Not Specified"}</span>
           )}
         </div>
+
         <div className="profile-field">
           <strong>Education:</strong>
           {isEditing ? (
-            <select name="education" value={formData.education} onChange={handleChange}>
+            <select name="education" value={formData.education || ""} onChange={handleChange}>
               <option value="">Select</option>
-              <option value="HighSchool">High School</option>
+              <option value="High School">High School</option>
               <option value="Diploma">Diploma</option>
               <option value="Degree">Degree</option>
             </select>
           ) : (
-            <span>{profile?.education || "Not Specified"}</span>
+            <span>{formData.education || "Not Specified"}</span>
           )}
         </div>
+
         <div className="profile-field">
           <strong>Skills:</strong>
           {isEditing ? (
-            <input type="text" name="skills" value={formData.skills} onChange={handleChange} />
+            <input type="text" name="skills" value={formData.skills || ""} onChange={handleChange} />
           ) : (
-            <span>{profile?.skills || "Not Specified"}</span>
+            <span>{formData.skills || "Not Specified"}</span>
           )}
         </div>
+
         <div className="profile-field">
           <strong>Interests:</strong>
           {isEditing ? (
-            <input type="text" name="interests" value={formData.interests} onChange={handleChange} />
+            <input type="text" name="interests" value={formData.interests || ""} onChange={handleChange} />
           ) : (
-            <span>{profile?.interests || "Not Specified"}</span>
+            <span>{formData.interests || "Not Specified"}</span>
           )}
         </div>
+
         <div className="profile-field">
           <strong>Previous Jobs:</strong>
           {isEditing ? (
-            <input type="text" name="previous_jobs" value={formData.previous_jobs} onChange={handleChange} />
+            <input type="text" name="previous_jobs" value={formData.previous_jobs || ""} onChange={handleChange} />
           ) : (
-            <span>{profile?.previous_jobs || "Not Specified"}</span>
+            <span>{formData.previous_jobs || "Not Specified"}</span>
           )}
         </div>
+        
         <div className="profile-field">
           <strong>Looking Jobs:</strong>
           {isEditing ? (
-            <input type="text" name="looking_jobs" value={formData.looking_jobs} onChange={handleChange} />
+            <input type="text" name="looking_jobs" value={formData.looking_jobs || ""} onChange={handleChange} />
           ) : (
-            <span>{profile?.looking_jobs || "Not Specified"}</span>
+            <span>{formData.looking_jobs || "Not Specified"}</span>
           )}
         </div>
+        
         <div className="profile-field">
           <strong>Description:</strong>
           {isEditing ? (
-            <input type="textarea" name="description" value={formData.description} onChange={handleChange} />
+            <textarea name="description" value={formData.description || ""} onChange={handleChange} />
           ) : (
-            <span>{profile?.description || "Not Specified"}</span>
+            <span>{formData.description || "Not Specified"}</span>
           )}
         </div>
+
         <div className="profile-field">
           <strong>Passport status:</strong>
           {isEditing ? (
-            <select name="passport_status" value={formData.passport_status} onChange={handleChange}>
+            <select name="passport_status" value={formData.passport_status || ""} onChange={handleChange}>
               <option value="">Select</option>
               <option value="Valid">Valid</option>
               <option value="Invalid">Invalid</option>
               <option value="Applied">Applied</option>
             </select>
           ) : (
-            <span>{profile?.passport_status || "Not Specified"}</span>
+            <span>{formData.passport_status || "Not Specified"}</span>
           )}
         </div>
+        
         <div className="profile-buttons">
           {isEditing ? (
             <>
@@ -226,4 +291,3 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
-  
