@@ -65,6 +65,7 @@ export const AuthProvider = ({ children }) => {
 
         loadUser();
     }, []);
+    
 
     const login = async (userData) => {
         try {
@@ -74,48 +75,82 @@ export const AuthProvider = ({ children }) => {
     
             console.log("Login data received:", userData);
     
-            // Check for missing specific_id
-            if (userData.specific_id === undefined || userData.specific_id === null) {
-                console.warn("No specific_id in login response!");
+            // Ensure specific_id is properly handled by explicitly checking and converting
+            // Extract the specific_id, ensuring we get it as a number or null
+            let specificId = null;
+            
+            // Check if specific_id exists and is a valid number
+            if (userData.specific_id !== undefined && 
+                userData.specific_id !== null && 
+                userData.specific_id !== "pending") {
                 
-                // Create a placeholder value to prevent API errors
-                // We'll handle this specially in API calls
-                userData.specific_id = "pending"; 
+                // Convert to number if it's a string or already a number
+                specificId = typeof userData.specific_id === 'string' 
+                    ? Number(userData.specific_id) 
+                    : userData.specific_id;
+                    
+                // Verify it's actually a number after conversion
+                if (isNaN(specificId)) {
+                    specificId = null;
+                }
             }
-    
-            // Save all user data to localStorage, handling any missing values
-            localStorage.setItem("token", userData.token);
+            
+            console.log("Specific ID validation:", {
+                original: userData.specific_id,
+                type: typeof userData.specific_id,
+                parsed: specificId,
+                isNumber: !isNaN(specificId)
+            });
+            
+            // Determine what to store - use the parsed ID if it's valid, otherwise "pending"
+            const specificIdToStore = specificId !== null ? String(specificId) : "pending";
+            
+            // Save user data to localStorage
+            localStorage.setItem("token", userData.access_token || userData.token);
             localStorage.setItem("role", userData.role);
             localStorage.setItem("user_id", userData.user_id);
-            localStorage.setItem("specific_id", String(userData.specific_id));
+            localStorage.setItem("specific_id", specificIdToStore);
             
-            console.log("Login successful:", {
-                email: userData.email,
+            // Also store email if available
+            if (userData.email) {
+                localStorage.setItem("email", userData.email);
+            }
+            
+            console.log("Storing in localStorage:", {
                 role: userData.role,
                 user_id: userData.user_id,
-                specific_id: userData.specific_id
+                specific_id: specificIdToStore
             });
     
-            setUser(userData);
+            // Create a user object with the clean values
+            const userObject = {
+                ...userData,
+                token: userData.access_token || userData.token,
+                specific_id: specificIdToStore
+            };
+            
+            setUser(userObject);
     
-            // Don't try to load profile immediately if specific_id is pending
-            // We'll handle this in the profile pages instead
-            if (userData.specific_id !== "pending") {
+            // Only try to create a profile if specific_id is "pending"
+            if (userData.role === "recruiter" && specificIdToStore === "pending") {
                 try {
-                    if (userData.role === "job_seeker") {
-                        const profileData = await fetchJobSeekerProfile();
-                        if (profileData) {
-                            setUserProfile(profileData);
-                        }
-                    } else if (userData.role === "recruiter") {
-                        const profileData = await fetchRecruiterProfile();
-                        if (profileData) {
-                            setUserProfile(profileData);
-                        }
+                    console.log("Attempting to create/fetch recruiter profile after login");
+                    const profileData = await fetchRecruiterProfile();
+                    
+                    // If we got a valid profile with an ID, update the user data
+                    if (profileData && profileData.agency_id) {
+                        const updatedSpecificId = String(profileData.agency_id);
+                        
+                        // Update localStorage and user state
+                        localStorage.setItem("specific_id", updatedSpecificId);
+                        
+                        // Update user object
+                        setUser(prev => ({...prev, specific_id: updatedSpecificId}));
+                        
+                        console.log("Updated specific_id after profile fetch:", updatedSpecificId);
                     }
-                } catch (error) {
-                    console.error("Error loading profile after login:", error);
-                    // Continue without profile data
+                } catch (profileError) {
+                    console.error("Error loading/creating profile after login:", profileError);
                 }
             }
     

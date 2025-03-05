@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
-from models import Job, User
+from models import Job, User, RecruitmentAgency
 from schemas import JobCreate, JobResponse
-# from auth import require_role
 from routers.auth import require_role
 from routers.auth import get_current_user
 
@@ -29,9 +28,9 @@ def post_job(job: JobCreate, db: Session = Depends(get_db), current_user: User =
     if not agency:
         raise HTTPException(status_code=404, detail="Recruiter agency profile not found")
     
-    # Set the recruiter_id to the agency_id
+    # IMPORTANT: Use agency_id as this matches the column name in the database model
     job_data = job.dict()
-    job_data["recruiter_id"] = agency.agency_id
+    job_data["agency_id"] = agency.agency_id
     
     new_job = Job(**job_data)
     db.add(new_job)
@@ -48,8 +47,13 @@ def delete_job(job_id: int, db: Session = Depends(get_db), current_user: User = 
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     
+    # Get the agency_id for the current user
+    agency = db.query(RecruitmentAgency).filter(RecruitmentAgency.user_id == current_user.user_id).first()
+    if not agency:
+        raise HTTPException(status_code=404, detail="Recruiter agency profile not found")
+    
     # Check if the current recruiter owns this job
-    if job.recruiter_id != current_user.recruiter_profile.agency_id:
+    if job.agency_id != agency.agency_id:
         raise HTTPException(status_code=403, detail="You don't have permission to delete this job")
     
     # Delete the job

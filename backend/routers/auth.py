@@ -78,7 +78,7 @@ def require_role(role: str):
     return role_dependency
 
 @router.post("/register", response_model=Token)
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
+async def register_user(user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -91,15 +91,15 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(new_user)
         
-        # Create empty profile based on user role
+        # Create profile based on user role
         specific_id = None
         
         if new_user.role == "job_seeker":
             try:
-                # Create empty job seeker profile
+                # Create job seeker profile
                 new_profile = JobSeeker(
                     user_id=new_user.user_id,
-                    name=new_user.name  # Set the name field from the user registration
+                    name=new_user.name
                 )
                 db.add(new_profile)
                 db.commit()
@@ -108,17 +108,23 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
                 print(f"Created job seeker profile with id {specific_id} for user {new_user.email}")
             except Exception as e:
                 print(f"Error creating job seeker profile: {str(e)}")
-                # Don't fail registration if profile creation fails
+                db.rollback()
                 specific_id = None
         
         elif new_user.role == "recruiter":
             try:
-                # Create empty recruitment agency profile
+                # Extract agency details from request if available
+                agency_name = user.name  # Use the name provided in registration
+                agency_location = getattr(user, 'agency_location', "Not Specified")
+                license_number = getattr(user, 'license_number', f"TMP-{new_user.user_id}")
+                
+                # Create recruitment agency profile
                 new_profile = RecruitmentAgency(
                     user_id=new_user.user_id,
-                    agency_name=new_user.name or "Agency",  # Use name from registration or default
-                    agency_location="Not specified",  # Placeholder
-                    license_number=f"TMP-{new_user.user_id}"  # Temporary unique license number
+                    agency_name=agency_name,
+                    agency_location=agency_location,
+                    license_number=license_number,
+                    contact_email=user.email  # Use the same email for contact_email
                 )
                 db.add(new_profile)
                 db.commit()
@@ -127,7 +133,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
                 print(f"Created agency profile with id {specific_id} for user {new_user.email}")
             except Exception as e:
                 print(f"Error creating agency profile: {str(e)}")
-                # Don't fail registration if profile creation fails
+                db.rollback()
                 specific_id = None
         
         access_token = create_access_token({
@@ -149,9 +155,10 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         db.rollback()
         print(f"Registration error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
+        
 
 @router.post("/login", response_model=Token)
-def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.email == form_data.username).first()
         if not user or not verify_password(form_data.password, user.password_hash):
@@ -164,7 +171,7 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
         # Get the role-specific ID
         specific_id = None
         if user.role == "job_seeker":
-            # First check if a profile already exists
+            # Try to find existing profile
             seeker = db.query(JobSeeker).filter(JobSeeker.user_id == user.user_id).first()
             if seeker:
                 specific_id = seeker.seeker_id
@@ -185,17 +192,8 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
                     print(f"Created new job seeker profile with ID: {specific_id}")
                 except Exception as e:
                     print(f"Error creating job seeker profile during login: {str(e)}")
-                    # Create a more basic profile - last resort
-                    try:
-                        new_profile = JobSeeker(user_id=user.user_id)
-                        db.add(new_profile)
-                        db.commit()
-                        db.refresh(new_profile)
-                        specific_id = new_profile.seeker_id
-                        print(f"Created basic job seeker profile with ID: {specific_id}")
-                    except Exception as e2:
-                        print(f"Failed to create even basic profile: {str(e2)}")
-                        # Continue with None specific_id
+                    db.rollback()
+                    # Continue with None specific_id
         
         elif user.role == "recruiter":
             agency = db.query(RecruitmentAgency).filter(RecruitmentAgency.user_id == user.user_id).first()
@@ -210,7 +208,8 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
                         user_id=user.user_id,
                         agency_name=user.name or "Agency",  # Use name from user data
                         agency_location="Not specified",  # Placeholder
-                        license_number=f"TMP-{user.user_id}"  # Temporary license
+                        license_number=f"TMP-{user.user_id}",  # Temporary license
+                        contact_email=user.email  # Use the same email
                     )
                     db.add(new_profile)
                     db.commit()
@@ -219,23 +218,8 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
                     print(f"Created new agency profile with ID: {specific_id}")
                 except Exception as e:
                     print(f"Error creating agency profile during login: {str(e)}")
+                    db.rollback()
                     # Continue with None specific_id
-        
-        # Check that we have a specific_id - this is critical
-        if specific_id is None:
-            print(f"WARNING: No specific_id found for user: {user.email}, role: {user.role}")
-            # Try one more time to get or create profile ID
-            if user.role == "job_seeker":
-                try:
-                    # Force create a new profile as a last resort
-                    emergency_profile = JobSeeker(user_id=user.user_id)
-                    db.add(emergency_profile)
-                    db.commit()
-                    db.refresh(emergency_profile)
-                    specific_id = emergency_profile.seeker_id
-                    print(f"Emergency creation of job seeker profile with ID: {specific_id}")
-                except Exception as e:
-                    print(f"Emergency profile creation failed: {str(e)}")
         
         # Include the specific ID in the token
         access_token = create_access_token({
@@ -245,13 +229,13 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
             "specific_id": specific_id
         })
         
-        # Create response with guaranteed specific_id (even if it's null)
+        # Create response with guarantees that specific_id is an integer or null
         response_data = {
             "access_token": access_token, 
             "token_type": "bearer", 
             "role": user.role, 
             "user_id": user.user_id,
-            "specific_id": specific_id
+            "specific_id": specific_id  # This will be an integer or None
         }
         
         print(f"Login response data: {response_data}")

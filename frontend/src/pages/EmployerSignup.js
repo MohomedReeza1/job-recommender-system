@@ -6,12 +6,13 @@ import "../styles/EmployerSignup.css";
 const EmployerSignup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: "",
+    agency_name: "",
     agency_location: "",
     license_number: "",
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,18 +21,27 @@ const EmployerSignup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    
     try {
+      // Register the user with agency name as name, email, password, and role="recruiter"
       await api.post("/auth/register", {
-        name: formData.name,
+        name: formData.agency_name,  // Use agency_name as the user name
         email: formData.email,
         password: formData.password,
         role: "recruiter", 
       });
+      
+      // The registration should already create the agency profile with the provided data
+      // If you need to update any agency-specific fields, you can do that here
+      
       alert("Employer account created successfully!");
       navigate("/employer-login");
     } catch (error) {
       console.error("Signup error:", error);
-      alert("Failed to create account.");
+      alert(error.response?.data?.detail || "Failed to create account.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -41,7 +51,7 @@ const EmployerSignup = () => {
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          name="name"
+          name="agency_name"
           placeholder="Company Name"
           value={formData.agency_name}
           onChange={handleChange}
@@ -66,8 +76,8 @@ const EmployerSignup = () => {
         <input
           type="email"
           name="email"
-          placeholder="Work Email"
-          value={formData.contact_email}
+          placeholder="Company Email"
+          value={formData.email}
           onChange={handleChange}
           required
         />
@@ -79,7 +89,9 @@ const EmployerSignup = () => {
           onChange={handleChange}
           required
         />
-        <button type="submit">Sign Up</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Creating Account..." : "Sign Up"}
+        </button>
       </form>
       <p>Already have an account? <a href="/employer-login">Login here</a></p>
     </div>

@@ -20,8 +20,10 @@ const MyPostedJobs = () => {
 
       try {
         setLoading(true);
-        const postedJobs = await fetchMyPostedJobs(user.user_id);
-        setJobs(postedJobs);
+        console.log("Fetching posted jobs...");
+        const postedJobs = await fetchMyPostedJobs();
+        console.log("Posted jobs:", postedJobs);
+        setJobs(postedJobs || []);
         setError(null);
       } catch (err) {
         console.error("Error fetching posted jobs:", err);
@@ -35,6 +37,10 @@ const MyPostedJobs = () => {
   }, [user, navigate]);
 
   const handleViewApplicants = (jobId) => {
+    if (!jobId) {
+      alert("Invalid job ID. Cannot view applicants.");
+      return;
+    }
     navigate(`/view-applicants/${jobId}`);
   };
 
@@ -46,7 +52,7 @@ const MyPostedJobs = () => {
         alert("Job deleted successfully!");
       } catch (error) {
         console.error("Error deleting job:", error);
-        alert("Failed to delete job.");
+        alert("Failed to delete job. Please try again.");
       }
     }
   };
@@ -73,6 +79,9 @@ const MyPostedJobs = () => {
     <div className="my-posted-jobs-container">
       <div className="header">
         <h2>My Posted Jobs</h2>
+        <button className="post-job-btn" onClick={() => navigate("/post-job")}>
+          Post a New Job
+        </button>
       </div>
 
       {jobs.length === 0 ? (
@@ -104,6 +113,12 @@ const MyPostedJobs = () => {
               </div>
               
               <div className="job-actions">
+                <button 
+                  className="view-applicants-btn"
+                  onClick={() => handleViewApplicants(job.job_id)}
+                >
+                  View Applicants
+                </button>
                 <button 
                   className="edit-btn"
                   onClick={() => handleEditJob(job.job_id)}

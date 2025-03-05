@@ -37,7 +37,7 @@ const AppRoutes = () => {
       <Route path="/my-posted-jobs" element={<PrivateRoute element={<MyPostedJobs />} allowedRoles={["recruiter"]} />} />
       <Route path="/post-job" element={<PrivateRoute element={<PostJob />} allowedRoles={["recruiter"]} />} />
       <Route path="/view-applicants" element={<PrivateRoute element={<ViewApplicants />} allowedRoles={["recruiter"]} />} />
-      {/* <Route path="/view-applicants/:jobId" element={<PrivateRoute element={<ViewApplicants />} allowedRoles={["recruiter"]} />} /> */}
+      <Route path="/view-applicants/:jobId" element={<PrivateRoute element={<ViewApplicants />} allowedRoles={["recruiter"]} />} />
       <Route path="/recruiter-profile" element={<PrivateRoute element={<RecruiterProfilePage />} allowedRoles={["recruiter"]} />} />
     </Routes>
   );
