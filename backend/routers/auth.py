@@ -115,10 +115,15 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
             try:
                 # Extract agency details from request if available
                 agency_name = user.name  # Use the name provided in registration
+                
+                # Check if additional agency fields were provided
                 agency_location = getattr(user, 'agency_location', "Not Specified")
                 license_number = getattr(user, 'license_number', f"TMP-{new_user.user_id}")
                 
-                # Create recruitment agency profile
+                # Log the received values for debugging
+                print(f"Creating agency with: name={agency_name}, location={agency_location}, license={license_number}")
+                
+                # Create recruitment agency profile with provided details
                 new_profile = RecruitmentAgency(
                     user_id=new_user.user_id,
                     agency_name=agency_name,

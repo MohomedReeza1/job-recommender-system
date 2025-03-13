@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchMyPostedJobs, deleteJob } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import "../../styles/MyPostedJobs.css";
 
 const MyPostedJobs = () => {
@@ -12,42 +12,42 @@ const MyPostedJobs = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const getPostedJobs = async () => {
-      if (!user) {
-        navigate("/employer-login");
-        return;
-      }
+    // Redirect if not logged in as a recruiter
+    if (!user || user.role !== "recruiter") {
+      navigate("/employer-login");
+      return;
+    }
 
+    const loadJobs = async () => {
       try {
         setLoading(true);
-        console.log("Fetching posted jobs...");
-        const postedJobs = await fetchMyPostedJobs();
-        console.log("Posted jobs:", postedJobs);
-        setJobs(postedJobs || []);
+        const jobsData = await fetchMyPostedJobs();
+        setJobs(jobsData);
         setError(null);
       } catch (err) {
-        console.error("Error fetching posted jobs:", err);
-        setError("Failed to load your posted jobs. Please try again later.");
+        console.error("Error loading jobs:", err);
+        setError("Failed to load your posted jobs. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    getPostedJobs();
+    loadJobs();
   }, [user, navigate]);
 
+  const handleEditJob = (jobId) => {
+    navigate(`/edit-job/${jobId}`);
+  };
+
   const handleViewApplicants = (jobId) => {
-    if (!jobId) {
-      alert("Invalid job ID. Cannot view applicants.");
-      return;
-    }
     navigate(`/view-applicants/${jobId}`);
   };
 
   const handleDeleteJob = async (jobId) => {
-    if (window.confirm("Are you sure you want to delete this job?")) {
+    if (window.confirm("Are you sure you want to delete this job posting? This action cannot be undone.")) {
       try {
         await deleteJob(jobId);
+        // Remove the deleted job from the state
         setJobs(jobs.filter(job => job.job_id !== jobId));
         alert("Job deleted successfully!");
       } catch (error) {
@@ -57,17 +57,13 @@ const MyPostedJobs = () => {
     }
   };
 
-  const handleEditJob = (jobId) => {
-    navigate(`/edit-job/${jobId}`);
-  };
-
   if (loading) {
-    return <div className="my-posted-jobs loading">Loading your posted jobs...</div>;
+    return <div className="my-jobs-container loading">Loading your posted jobs...</div>;
   }
 
   if (error) {
     return (
-      <div className="my-posted-jobs error">
+      <div className="my-jobs-container error">
         <h2>Error</h2>
         <p>{error}</p>
         <button onClick={() => window.location.reload()}>Try Again</button>
@@ -76,10 +72,14 @@ const MyPostedJobs = () => {
   }
 
   return (
-    <div className="my-posted-jobs-container">
-      <div className="header">
-        <h2>My Posted Jobs</h2>
-        <button className="post-job-btn" onClick={() => navigate("/post-job")}>
+    <div className="my-jobs-container">
+      <h2>My Posted Jobs</h2>
+      
+      <div className="action-bar">
+        <button 
+          className="post-job-btn"
+          onClick={() => navigate("/post-job")}
+        >
           Post a New Job
         </button>
       </div>
@@ -87,29 +87,29 @@ const MyPostedJobs = () => {
       {jobs.length === 0 ? (
         <div className="no-jobs">
           <p>You haven't posted any jobs yet.</p>
-          <button onClick={() => navigate("/post-job")}>Post Your First Job</button>
+          <p>Start by posting your first job opening!</p>
         </div>
       ) : (
         <div className="jobs-list">
           {jobs.map((job) => (
-            <div key={job.job_id} className="job-item">
+            <div key={job.job_id} className="job-card">
               <div className="job-header">
                 <h3>{job.job_title}</h3>
-                <span className="post-date">
-                  Posted on: {new Date(job.created_at).toLocaleDateString()}
-                </span>
+                <span className="country-badge">{job.country}</span>
               </div>
               
               <div className="job-details">
-                <p><strong>Country:</strong> {job.country}</p>
+                <p className="job-description">{job.job_description}</p>
                 <p><strong>Skills Required:</strong> {job.skills_required}</p>
+                
                 {job.salary && <p><strong>Salary:</strong> {job.salary}</p>}
-                {job.available_quantity !== undefined && (
-                  <p>
-                    <strong>Positions:</strong> {job.available_quantity} available
-                    {job.num_of_job_seekers_required && ` of ${job.num_of_job_seekers_required}`}
-                  </p>
-                )}
+                
+                <div className="job-meta">
+                  <span><strong>Posted:</strong> {new Date(job.created_at).toLocaleDateString()}</span>
+                  {job.available_quantity && (
+                    <span><strong>Available Positions:</strong> {job.available_quantity}</span>
+                  )}
+                </div>
               </div>
               
               <div className="job-actions">

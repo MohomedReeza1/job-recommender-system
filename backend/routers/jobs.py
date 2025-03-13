@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models import Job, User, RecruitmentAgency
-from schemas import JobCreate, JobResponse
+from schemas import JobCreate, JobResponse, JobBase
 from routers.auth import require_role
 from routers.auth import get_current_user
 
@@ -61,3 +61,31 @@ def delete_job(job_id: int, db: Session = Depends(get_db), current_user: User = 
     db.commit()
     
     return {"message": "Job deleted successfully"}
+
+@router.put("/jobs/{job_id}", response_model=JobResponse, dependencies=[Depends(require_role("recruiter"))])
+def update_job(job_id: int, job_data: JobBase, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    """
+    Updates an existing job posting if the authenticated recruiter is the owner.
+    """
+    job = db.query(Job).filter(Job.job_id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Get the agency_id for the current user
+    agency = db.query(RecruitmentAgency).filter(RecruitmentAgency.user_id == current_user.user_id).first()
+    if not agency:
+        raise HTTPException(status_code=404, detail="Recruiter agency profile not found")
+    
+    # Check if the current recruiter owns this job
+    if job.agency_id != agency.agency_id:
+        raise HTTPException(status_code=403, detail="You don't have permission to update this job")
+    
+    # Update job fields
+    for key, value in job_data.dict().items():
+        setattr(job, key, value)
+    
+    # Save changes
+    db.commit()
+    db.refresh(job)
+    
+    return job

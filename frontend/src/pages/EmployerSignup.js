@@ -13,6 +13,7 @@ const EmployerSignup = () => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,24 +23,27 @@ const EmployerSignup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     
     try {
-      // Register the user with agency name as name, email, password, and role="recruiter"
+      console.log("Submitting registration with data:", formData);
+      
+      // Register the user with complete agency details
       await api.post("/auth/register", {
-        name: formData.agency_name,  // Use agency_name as the user name
+        name: formData.agency_name,
         email: formData.email,
         password: formData.password,
-        role: "recruiter", 
+        role: "recruiter",
+        // Pass additional agency fields
+        agency_location: formData.agency_location,
+        license_number: formData.license_number,
       });
-      
-      // The registration should already create the agency profile with the provided data
-      // If you need to update any agency-specific fields, you can do that here
       
       alert("Employer account created successfully!");
       navigate("/employer-login");
     } catch (error) {
       console.error("Signup error:", error);
-      alert(error.response?.data?.detail || "Failed to create account.");
+      setError(error.response?.data?.detail || "Failed to create account.");
     } finally {
       setLoading(false);
     }
@@ -48,6 +52,13 @@ const EmployerSignup = () => {
   return (
     <div className="signup-container">
       <h2>Employer Signup</h2>
+      
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit}>
         <input
           type="text"

@@ -1,127 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { fetchRecruiterProfile, createRecruiterProfile, updateRecruiterProfile } from "../services/api";
-import { useAuth } from "../context/AuthContext";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/ProfilePage.css";
+import { fetchRecruiterProfile } from "../services/api";
+import { useAuth } from "../context/AuthContext";
+import "../styles/ProfilePage.css"; // Reusing the existing styling
 
 const RecruiterProfilePage = () => {
-  const { user, updateProfile } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [formData, setFormData] = useState({
-    agency_name: "",
-    agency_location: "",
-    license_number: "",
-    contact_email: "",
-  });
 
   useEffect(() => {
+    // Redirect if not logged in as a recruiter
     if (!user || user.role !== "recruiter") {
       navigate("/employer-login");
       return;
     }
 
-    const fetchProfile = async () => {
+    const loadProfileData = async () => {
       try {
         setLoading(true);
-        console.log("Fetching recruiter profile...");
-        const response = await fetchRecruiterProfile();
-        console.log("Profile response:", response);
+        setError(null);
         
-        if (response) {
-          setProfile(response);
-          setFormData({
-            agency_name: response.agency_name || "",
-            agency_location: response.agency_location || "",
-            license_number: response.license_number || "",
-            contact_email: response.contact_email || ""
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching recruiter profile:", error);
-        setError("Failed to load profile. Please try again.");
+        const profileData = await fetchRecruiterProfile();
+        setProfile(profileData);
+        
+      } catch (err) {
+        console.error("Error loading recruiter profile:", err);
+        setError("Failed to load agency profile. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfile();
+    loadProfileData();
   }, [user, navigate]);
 
-  const handleEdit = () => setIsEditing(true);
-  
-  const handleCancel = () => {
-    setIsEditing(false);
-    // Reset form data to current profile values
-    if (profile) {
-      setFormData({
-        agency_name: profile.agency_name || "",
-        agency_location: profile.agency_location || "",
-        license_number: profile.license_number || "",
-        contact_email: profile.contact_email || ""
-      });
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      const specific_id = localStorage.getItem("specific_id");
-      const user_id = localStorage.getItem("user_id");
-      
-      // Prepare the data payload
-      const payload = { 
-        ...formData, 
-        user_id: parseInt(user_id) 
-      };
-
-      let updatedProfile;
-      
-      if (profile && specific_id && specific_id !== "pending") {
-        // Update existing profile
-        updatedProfile = await updateRecruiterProfile(specific_id, payload);
-        alert("Profile updated successfully.");
-      } else {
-        // Create new profile
-        updatedProfile = await createRecruiterProfile(payload);
-        
-        // Update specific_id in localStorage if needed
-        if (updatedProfile && updatedProfile.agency_id) {
-          localStorage.setItem("specific_id", updatedProfile.agency_id.toString());
-        }
-        
-        alert("Profile created successfully.");
-      }
-      
-      setIsEditing(false);
-      setProfile(updatedProfile);
-      
-      // Update profile in context if needed
-      if (updateProfile) {
-        updateProfile(updatedProfile);
-      }
-    } catch (err) {
-      console.error("Error updating recruiter profile:", err);
-      alert("Error updating profile. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (loading) {
-    return <div className="profile-container">Loading profile...</div>;
+    return <div className="profile-container">Loading agency profile...</div>;
   }
 
-  if (error && !profile) {
+  if (error) {
     return (
       <div className="profile-container">
         <h2>Error</h2>
@@ -131,75 +51,44 @@ const RecruiterProfilePage = () => {
     );
   }
 
+  if (!profile) {
+    return <div className="profile-container">No profile information found.</div>;
+  }
+
   return (
     <div className="profile-container">
-      <h2>Recruiter Profile</h2>
+      <h2>Agency Profile</h2>
       <div className="profile-card">
         <div className="profile-field">
           <strong>Agency Name:</strong>
-          {isEditing ? (
-            <input 
-              type="text" 
-              name="agency_name" 
-              value={formData.agency_name} 
-              onChange={handleChange}
-              placeholder="Enter agency name" 
-            />
-          ) : (
-            <span>{formData.agency_name || "Not Specified"}</span>
-          )}
+          <span>{profile.agency_name || "Not Specified"}</span>
         </div>
+
         <div className="profile-field">
-          <strong>Agency Location:</strong>
-          {isEditing ? (
-            <input 
-              type="text" 
-              name="agency_location" 
-              value={formData.agency_location} 
-              onChange={handleChange}
-              placeholder="Enter agency location" 
-            />
-          ) : (
-            <span>{formData.agency_location || "Not Specified"}</span>
-          )}
+          <strong>Location:</strong>
+          <span>{profile.agency_location || "Not Specified"}</span>
         </div>
+
         <div className="profile-field">
           <strong>License Number:</strong>
-          {isEditing ? (
-            <input 
-              type="text" 
-              name="license_number" 
-              value={formData.license_number} 
-              onChange={handleChange}
-              placeholder="Enter license number" 
-            />
-          ) : (
-            <span>{formData.license_number || "Not Specified"}</span>
-          )}
+          <span>{profile.license_number || "Not Specified"}</span>
         </div>
+
         <div className="profile-field">
           <strong>Contact Email:</strong>
-          {isEditing ? (
-            <input 
-              type="email" 
-              name="contact_email" 
-              value={formData.contact_email} 
-              onChange={handleChange}
-              placeholder="Enter contact email" 
-            />
-          ) : (
-            <span>{formData.contact_email || "Not Specified"}</span>
-          )}
+          <span>{profile.contact_email || "Not Specified"}</span>
         </div>
+
+        <div className="profile-field">
+          <strong>Registered On:</strong>
+          <span>{profile.created_at ? new Date(profile.created_at).toLocaleDateString() : "Not Specified"}</span>
+        </div>
+        
+        {/* Back to Jobs button */}
         <div className="profile-buttons">
-          {isEditing ? (
-            <>
-              <button onClick={handleSave} className="save-btn">Save</button>
-              <button onClick={handleCancel} className="cancel-btn">Cancel</button>
-            </>
-          ) : (
-            <button onClick={handleEdit} className="edit-btn">Edit Profile</button>
-          )}
+          <button onClick={() => navigate("/my-posted-jobs")} className="edit-btn">
+            Back to My Jobs
+          </button>
         </div>
       </div>
     </div>

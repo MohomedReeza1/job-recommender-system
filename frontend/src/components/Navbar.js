@@ -24,7 +24,7 @@ const Navbar = () => {
             <>
               <li><Link to="/my-posted-jobs">My Posted Jobs</Link></li>
               <li><Link to="/post-job">Post a Job</Link></li>
-              <li><Link to="/view-applicants">View Applicants</Link></li>
+              {/* <li><Link to="/view-applicants">View Applicants</Link></li> */}
               <li><Link to="/recruiter-profile">Profile</Link></li>
             </>
           ) : null

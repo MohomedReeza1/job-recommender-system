@@ -11,6 +11,8 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    agency_location: str
+    license_number: str
 
 
 class UserResponse(UserBase):

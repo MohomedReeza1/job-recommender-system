@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import "../../styles/ViewApplicants.css";
 
 const ViewApplicants = () => {
-  const { jobId } = useParams(); // Get jobId from URL params
+  const { jobId } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [job, setJob] = useState(null);
@@ -21,8 +21,8 @@ const ViewApplicants = () => {
       return;
     }
 
-    // Validate jobId
-    if (!jobId || jobId === "undefined" || jobId === "null") {
+    // Check if jobId is valid
+    if (!jobId || jobId === "undefined") {
       setError("Invalid job ID. Please select a valid job.");
       setLoading(false);
       return;
@@ -31,10 +31,6 @@ const ViewApplicants = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
-        // Log jobId for debugging
-        console.log("Fetching details for job ID:", jobId);
-        
         // Fetch job details
         const jobData = await fetchJobDetails(jobId);
         setJob(jobData);
@@ -71,8 +67,6 @@ const ViewApplicants = () => {
   const handleViewDocument = (filename) => {
     if (filename) {
       window.open(`http://localhost:8000/uploads/${filename}`, '_blank');
-    } else {
-      alert("Document not available");
     }
   };
 
@@ -85,7 +79,9 @@ const ViewApplicants = () => {
       <div className="view-applicants error">
         <h2>Error</h2>
         <p>{error}</p>
-        <button onClick={() => navigate("/my-posted-jobs")}>Back to My Jobs</button>
+        <button onClick={() => navigate("/my-posted-jobs")} className="back-btn">
+          Back to My Jobs
+        </button>
       </div>
     );
   }
@@ -118,7 +114,7 @@ const ViewApplicants = () => {
             <h3>Total Applicants: {applicants.length}</h3>
             <div className="applicants-list">
               {applicants.map((applicant) => (
-                <div key={applicant.application_id || Math.random()} className="applicant-card">
+                <div key={applicant.application_id} className="applicant-card">
                   <div className="applicant-info">
                     <h4>{applicant.name || "Applicant"}</h4>
                     <p><strong>Applied:</strong> {new Date(applicant.applied_at).toLocaleDateString()}</p>

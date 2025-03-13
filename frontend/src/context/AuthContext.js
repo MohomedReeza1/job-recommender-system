@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchJobSeekerProfile, fetchRecruiterProfile } from "../services/api";
+import { fetchJobSeekerProfile, fetchRecruiterProfile, fetchAgencyIdForUser } from "../services/api";
 
 export const AuthContext = createContext();
 
@@ -20,10 +20,9 @@ export const AuthProvider = ({ children }) => {
                 const user_id = localStorage.getItem("user_id");
                 const specific_id = localStorage.getItem("specific_id");
 
-                // console.log("Loading user from storage:", { token, role, user_id, specific_id });
+                console.log("Loading from localStorage:", { token: !!token, role, user_id, specific_id });
 
                 if (token && role && user_id) {
-                    // Even if specific_id is missing, we still want to set the user
                     const userData = { 
                         token, 
                         role, 
@@ -32,9 +31,8 @@ export const AuthProvider = ({ children }) => {
                     };
                     setUser(userData);
                     
-                    // Attempt to load profile even if specific_id is missing
-                    // The API functions should handle this gracefully
                     try {
+                        // Load appropriate profile based on role
                         if (role === "job_seeker") {
                             const profileData = await fetchJobSeekerProfile();
                             if (profileData) {
@@ -48,12 +46,10 @@ export const AuthProvider = ({ children }) => {
                         }
                     } catch (error) {
                         console.error("Error loading profile on app start:", error);
-                        // Don't throw error, just continue with null profile
                     }
                 }
             } catch (error) {
                 console.error("Error loading user:", error);
-                // Clear potentially corrupted auth data
                 localStorage.removeItem("token");
                 localStorage.removeItem("role");
                 localStorage.removeItem("user_id");
@@ -66,103 +62,109 @@ export const AuthProvider = ({ children }) => {
         loadUser();
     }, []);
     
-
     const login = async (userData) => {
         try {
-            if (!userData || !userData.token) {
-                throw new Error("Invalid login data received");
+            // Enhanced validation with detailed logging
+            if (!userData) {
+                console.error("userData is completely missing");
+                throw new Error("Invalid login data received: userData is null or undefined");
             }
-    
-            console.log("Login data received:", userData);
-    
-            // Ensure specific_id is properly handled by explicitly checking and converting
-            // Extract the specific_id, ensuring we get it as a number or null
-            let specificId = null;
             
-            // Check if specific_id exists and is a valid number
-            if (userData.specific_id !== undefined && 
-                userData.specific_id !== null && 
-                userData.specific_id !== "pending") {
+            // Log the input data exactly as received
+            console.log("Login data received:", userData);
+            
+            // Verify token existence with better debug info
+            const token = userData.token || userData.access_token;
+            if (!token) {
+                console.error("No token found in userData:", userData);
+                throw new Error("Invalid login data received: No token found");
+            }
+            
+            // Extract other essential data
+            const userId = userData.user_id;
+            const role = userData.role;
+            
+            // Additional validation
+            if (!userId || !role) {
+                console.error("Missing critical data:", { userId, role });
+                throw new Error("Invalid login data: Missing user_id or role");
+            }
+            
+            // Save the basic user data immediately
+            localStorage.setItem("token", token);
+            localStorage.setItem("role", role);
+            localStorage.setItem("user_id", userId);
+            
+            // Extract specific_id directly from response if available
+            let specificId = userData.specific_id;
+            console.log("Raw specific_id from response:", specificId, "Type:", typeof specificId);
+            
+            // If specific_id is missing, fetch it based on role
+            if ((!specificId || specificId === undefined || specificId === null) && role === "recruiter") {
+                console.log("specific_id is missing in login response, attempting to fetch it");
                 
-                // Convert to number if it's a string or already a number
-                specificId = typeof userData.specific_id === 'string' 
-                    ? Number(userData.specific_id) 
-                    : userData.specific_id;
+                try {
+                    specificId = await fetchAgencyIdForUser();
+                    console.log("Fetched specific_id for recruiter:", specificId);
                     
-                // Verify it's actually a number after conversion
-                if (isNaN(specificId)) {
-                    specificId = null;
+                    if (specificId) {
+                        // Update the userData object with the fetched specific_id
+                        userData.specific_id = specificId;
+                    }
+                } catch (fetchError) {
+                    console.error("Error fetching specific_id:", fetchError);
                 }
             }
             
-            console.log("Specific ID validation:", {
-                original: userData.specific_id,
-                type: typeof userData.specific_id,
-                parsed: specificId,
-                isNumber: !isNaN(specificId)
-            });
-            
-            // Determine what to store - use the parsed ID if it's valid, otherwise "pending"
-            const specificIdToStore = specificId !== null ? String(specificId) : "pending";
-            
-            // Save user data to localStorage
-            localStorage.setItem("token", userData.access_token || userData.token);
-            localStorage.setItem("role", userData.role);
-            localStorage.setItem("user_id", userData.user_id);
-            localStorage.setItem("specific_id", specificIdToStore);
-            
-            // Also store email if available
-            if (userData.email) {
-                localStorage.setItem("email", userData.email);
+            // Now save specific_id to localStorage if we have it
+            if (specificId !== undefined && specificId !== null) {
+                const specificIdString = String(specificId);
+                console.log("Saving specific_id to localStorage:", specificIdString);
+                localStorage.setItem("specific_id", specificIdString);
+            } else {
+                console.warn("Could not determine specific_id");
+                localStorage.setItem("specific_id", "");
             }
             
-            console.log("Storing in localStorage:", {
-                role: userData.role,
-                user_id: userData.user_id,
-                specific_id: specificIdToStore
-            });
-    
-            // Create a user object with the clean values
+            // For debugging - check what was stored
+            console.log("Verifying localStorage after saving:");
+            console.log("- token:", localStorage.getItem("token") ? "saved" : "missing");
+            console.log("- role:", localStorage.getItem("role"));
+            console.log("- user_id:", localStorage.getItem("user_id"));
+            console.log("- specific_id:", localStorage.getItem("specific_id"));
+            
+            // Create user object with consistent properties
             const userObject = {
-                ...userData,
-                token: userData.access_token || userData.token,
-                specific_id: specificIdToStore
+                token: token,
+                role: role,
+                user_id: userId,
+                specific_id: specificId
             };
             
             setUser(userObject);
-    
-            // Only try to create a profile if specific_id is "pending"
-            if (userData.role === "recruiter" && specificIdToStore === "pending") {
-                try {
-                    console.log("Attempting to create/fetch recruiter profile after login");
+            
+            // Also load the profile data based on role
+            try {
+                if (role === "job_seeker") {
+                    const profileData = await fetchJobSeekerProfile();
+                    setUserProfile(profileData);
+                } else if (role === "recruiter") {
                     const profileData = await fetchRecruiterProfile();
-                    
-                    // If we got a valid profile with an ID, update the user data
-                    if (profileData && profileData.agency_id) {
-                        const updatedSpecificId = String(profileData.agency_id);
-                        
-                        // Update localStorage and user state
-                        localStorage.setItem("specific_id", updatedSpecificId);
-                        
-                        // Update user object
-                        setUser(prev => ({...prev, specific_id: updatedSpecificId}));
-                        
-                        console.log("Updated specific_id after profile fetch:", updatedSpecificId);
-                    }
-                } catch (profileError) {
-                    console.error("Error loading/creating profile after login:", profileError);
+                    setUserProfile(profileData);
                 }
+            } catch (profileError) {
+                console.error("Error loading profile after login:", profileError);
             }
-    
-            // Redirect after login based on role
-            if (userData.role === "job_seeker") {
+            
+            // Redirect based on role
+            if (role === "job_seeker") {
                 navigate("/jobs");
-            } else if (userData.role === "recruiter") {
+            } else if (role === "recruiter") {
                 navigate("/my-posted-jobs");
             }
         } catch (error) {
             console.error("Login failed:", error);
-            alert("Login failed. Please try again.");
+            alert("Login failed. Please try again: " + error.message);
         }
     };
   

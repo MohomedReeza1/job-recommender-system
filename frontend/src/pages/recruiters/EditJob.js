@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { postJob } from "../../services/api";
+import { useParams, useNavigate } from "react-router-dom";
+import { fetchJobDetails, updateJob } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import "../../styles/PostJob.css";
+import "../../styles/PostJob.css"; // Reusing the existing styling
 
-const PostJob = () => {
+const EditJob = () => {
+  const { jobId } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     job_title: "",
     country: "",
@@ -24,19 +26,42 @@ const PostJob = () => {
   });
 
   useEffect(() => {
-    // Redirect if not logged in as a recruiter
     if (!user || user.role !== "recruiter") {
       navigate("/employer-login");
       return;
     }
-  }, [user, navigate]);
+
+    // Fetch job details
+    const fetchJob = async () => {
+      try {
+        setLoading(true);
+        const jobData = await fetchJobDetails(jobId);
+        
+        // Convert any null values to empty strings for the form
+        const sanitizedData = Object.entries(jobData).reduce((acc, [key, value]) => {
+          acc[key] = value === null ? "" : value;
+          return acc;
+        }, {});
+        
+        setFormData(sanitizedData);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching job details:", err);
+        setError("Failed to load job details. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJob();
+  }, [jobId, user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [name]: value
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -56,20 +81,34 @@ const PostJob = () => {
         jobData.available_quantity = parseInt(jobData.available_quantity, 10);
       }
       
-      await postJob(jobData);
-      alert("Job posted successfully!");
+      await updateJob(jobId, jobData);
+      alert("Job updated successfully!");
       navigate("/my-posted-jobs");
     } catch (error) {
-      console.error("Error posting job:", error);
-      alert(error.response?.data?.detail || "Failed to post job. Please try again.");
+      console.error("Error updating job:", error);
+      alert(error.response?.data?.detail || "Failed to update job. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  if (loading && !formData.job_title) {
+    return <div className="post-job-container">Loading job details...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="post-job-container">
+        <h2>Error</h2>
+        <p>{error}</p>
+        <button onClick={() => navigate("/my-posted-jobs")}>Back to My Jobs</button>
+      </div>
+    );
+  }
+
   return (
     <div className="post-job-container">
-      <h2>Post a New Job</h2>
+      <h2>Edit Job: {formData.job_title}</h2>
       
       <form onSubmit={handleSubmit} className="post-job-form">
         <div className="form-group">
@@ -84,7 +123,6 @@ const PostJob = () => {
           />
         </div>
         
-        {/* Continue with other form fields... */}
         <div className="form-group">
           <label htmlFor="country">Country *</label>
           <select
@@ -92,7 +130,8 @@ const PostJob = () => {
             name="country"
             value={formData.country}
             onChange={handleChange}
-            required>
+            required
+          >
             <option value="">Select Country</option>
             <option value="Saudi Arabia">Saudi Arabia</option>
             <option value="Qatar">Qatar</option>
@@ -235,14 +274,21 @@ const PostJob = () => {
             />
           </div>
         </div>
-
-
+        
         <div className="form-actions">
-          <button type="button" onClick={() => navigate("/my-posted-jobs")} className="cancel-btn">
+          <button 
+            type="button" 
+            onClick={() => navigate("/my-posted-jobs")} 
+            className="cancel-btn"
+          >
             Cancel
           </button>
-          <button type="submit" className="submit-btn" disabled={loading}>
-            {loading ? "Posting..." : "Post Job"}
+          <button 
+            type="submit" 
+            className="submit-btn" 
+            disabled={loading}
+          >
+            {loading ? "Updating..." : "Update Job"}
           </button>
         </div>
       </form>
@@ -250,4 +296,4 @@ const PostJob = () => {
   );
 };
 
-export default PostJob;
+export default EditJob;

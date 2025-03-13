@@ -10,6 +10,7 @@ import JobSeekerSignup from "../pages/JobSeekerSignup";
 import JobSeekerLogin from "../pages/JobSeekerLogin";
 import MyPostedJobs from "../pages/recruiters/MyPostedJobs";
 import PostJob from "../pages/recruiters/PostJob";
+import EditJob from "../pages/recruiters/EditJob";
 import ViewApplicants from "../pages/recruiters/ViewApplicants";
 import RecruiterProfilePage from "../pages/RecruiterProfilePage";
 import ApplyJobPage from "../pages/ApplyJobPage";
@@ -36,6 +37,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<JobSeekerLogin />} />
       <Route path="/my-posted-jobs" element={<PrivateRoute element={<MyPostedJobs />} allowedRoles={["recruiter"]} />} />
       <Route path="/post-job" element={<PrivateRoute element={<PostJob />} allowedRoles={["recruiter"]} />} />
+      <Route path="/edit-job/:jobId" element={<PrivateRoute element={<EditJob />} allowedRoles={["recruiter"]} />} />
       <Route path="/view-applicants" element={<PrivateRoute element={<ViewApplicants />} allowedRoles={["recruiter"]} />} />
       <Route path="/view-applicants/:jobId" element={<PrivateRoute element={<ViewApplicants />} allowedRoles={["recruiter"]} />} />
       <Route path="/recruiter-profile" element={<PrivateRoute element={<RecruiterProfilePage />} allowedRoles={["recruiter"]} />} />
