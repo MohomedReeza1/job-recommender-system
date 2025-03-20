@@ -32,7 +32,7 @@ const Home = () => {
       <div className="hero-section">
         <img src={heroImage} alt="Handshake" className="hero-image" />
         <div className="hero-overlay">
-          <h1>Find Your Perfect Job</h1>
+          <h1>Find Your Perfect Jobs</h1>
           <p>Get job recommendations that match your skills and interests.</p>
           <button className="cta-button" onClick={() => navigate("/jobs")}>
             Explore Jobs
