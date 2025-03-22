@@ -8,12 +8,6 @@ import os
 # Create uploads directory if it doesn't exist
 os.makedirs("uploads", exist_ok=True)
 
-
-# @app.on_event("startup")
-# async def startup():
-#     # Create database tables if they don't exist
-#     Base.metadata.create_all(bind=engine)
-
 Base.metadata.create_all(bind=engine)
 
 # Initialize app
@@ -29,7 +23,7 @@ app.include_router(seekers.router, prefix="/api", tags=["Job Seekers"])
 app.include_router(recommendations.router, prefix="/api", tags=["Recommendations"])
 app.include_router(recruiters.router, prefix="/api", tags=["Recruiters"])
 
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
 app.add_middleware(
     CORSMiddleware,
