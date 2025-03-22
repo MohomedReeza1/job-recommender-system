@@ -8,8 +8,11 @@ import os
 # Create uploads directory if it doesn't exist
 os.makedirs("uploads", exist_ok=True)
 
-# Initialize database
-Base.metadata.create_all(bind=engine)
+
+@app.on_event("startup")
+async def startup():
+    # Create database tables if they don't exist
+    Base.metadata.create_all(bind=engine)
 
 # Initialize app
 app = FastAPI()
@@ -33,3 +36,4 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # Allow all headers (e.g., Content-Type)
 )
+
