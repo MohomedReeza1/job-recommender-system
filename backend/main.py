@@ -29,7 +29,7 @@ app.include_router(seekers.router, prefix="/api", tags=["Job Seekers"])
 app.include_router(recommendations.router, prefix="/api", tags=["Recommendations"])
 app.include_router(recruiters.router, prefix="/api", tags=["Recruiters"])
 
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
 
 app.add_middleware(
     CORSMiddleware,
