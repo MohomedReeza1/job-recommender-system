@@ -3063,10 +3063,10 @@ I'm experienced driver looking for foreign employment job opportunities.
 
 
 
+${{ Postgres.DATABASE_URL }}
 
 
-
-
+postgresql://postgres:CEJNvEBDXynTMoHOxrlokEVizwYgdoXI@nozomi.proxy.rlwy.net:45281/railway
 
 
 
