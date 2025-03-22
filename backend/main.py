@@ -9,10 +9,12 @@ import os
 os.makedirs("uploads", exist_ok=True)
 
 
-@app.on_event("startup")
-async def startup():
-    # Create database tables if they don't exist
-    Base.metadata.create_all(bind=engine)
+# @app.on_event("startup")
+# async def startup():
+#     # Create database tables if they don't exist
+#     Base.metadata.create_all(bind=engine)
+
+Base.metadata.create_all(bind=engine)
 
 # Initialize app
 app = FastAPI()
