@@ -1,40 +1,60 @@
-# ============================
-# FRONTEND (React) IGNORES
-# ============================
-node_modules/
-npm-debug.log
-yarn-debug.log
-yarn-error.log
-package-lock.json
-build/
-
-# ============================
-# BACKEND (Python & FastAPI) IGNORES
-# ============================
-# Virtual environments
-venv/
-env/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Dependency files
-Pipfile
-Pipfile.lock
-poetry.lock
-requirements.txt
-
-# Database files
-*.sqlite3
-*.db
+# Environment variables
 .env
-config.json
+**/.env
+**/frontend/.env
+**/backend/.env
+.env.local
+.env.development
+.env.test
+.env.production
 
-# Logs & temporary files
-*.log
-*.cache
+# Node.js / React
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+build/
+dist/
+coverage/
+.npm
+
+# Python / FastAPI
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.pytest_cache/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
 .DS_Store
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
-# Ignore environment variables
-backend/.env
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
