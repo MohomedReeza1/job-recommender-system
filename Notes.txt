@@ -3073,7 +3073,13 @@ FULL WORKING WEBAPP FOR JOB RECOMMENDATION SYSTEM FOR FYP IS IMPLEMENTED
 Could you help me debug and properly prepare my requirements.txt file for deployment?
 
 
-
+cd app/backend
+git init
+git add .
+git commit -m "Initial backend commit"
+git branch -M main
+git remote add origin https://github.com/MohomedReeza1/job-recommendation-backend.git
+git push -u origin main
 
 
 
