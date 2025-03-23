@@ -9,7 +9,7 @@ from routers.auth import get_current_user
 router = APIRouter()
 
 @router.get("/jobs/", response_model=list[JobResponse])
-def get_jobs(skip: int = 0, limit: int = 30, db: Session = Depends(get_db)):
+def get_jobs(skip: int = 0, limit: int = 200, db: Session = Depends(get_db)):
     jobs = db.query(Job).offset(skip).limit(limit).all()
     return jobs
 
