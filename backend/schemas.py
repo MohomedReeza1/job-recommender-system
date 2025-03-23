@@ -11,8 +11,8 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    agency_location: str
-    license_number: str
+    agency_location: Optional[str] = None
+    license_number: Optional[str] = None
 
 
 class UserResponse(UserBase):

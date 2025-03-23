@@ -82,6 +82,13 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
+
+    if user.role == "recruiter":
+        if not user.agency_location or not user.license_number:
+            raise HTTPException(
+                status_code=422, 
+                detail="Agency location and license number are required for recruiters"
+            )
     
     try:
         # Create user
