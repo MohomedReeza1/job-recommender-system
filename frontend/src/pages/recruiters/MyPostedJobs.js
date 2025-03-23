@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchMyPostedJobs, deleteJob } from "../../services/api";
+import { fetchMyPostedJobs } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "../../styles/MyPostedJobs.css";
 
@@ -41,20 +41,6 @@ const MyPostedJobs = () => {
 
   const handleViewApplicants = (jobId) => {
     navigate(`/view-applicants/${jobId}`);
-  };
-
-  const handleDeleteJob = async (jobId) => {
-    if (window.confirm("Are you sure you want to delete this job posting? This action cannot be undone.")) {
-      try {
-        await deleteJob(jobId);
-        // Remove the deleted job from the state
-        setJobs(jobs.filter(job => job.job_id !== jobId));
-        alert("Job deleted successfully!");
-      } catch (error) {
-        console.error("Error deleting job:", error);
-        alert("Failed to delete job. Please try again.");
-      }
-    }
   };
 
   if (loading) {
@@ -124,12 +110,6 @@ const MyPostedJobs = () => {
                   onClick={() => handleEditJob(job.job_id)}
                 >
                   Edit
-                </button>
-                <button 
-                  className="delete-btn"
-                  onClick={() => handleDeleteJob(job.job_id)}
-                >
-                  Delete
                 </button>
               </div>
             </div>

@@ -113,7 +113,7 @@
   justify-content: flex-end;
 }
 
-.view-applicants-btn, .edit-btn, .delete-btn {
+.view-applicants-btn, .edit-btn {
   padding: 8px 15px;
   border: none;
   border-radius: 5px;
@@ -138,15 +138,6 @@
 
 .edit-btn:hover {
   background-color: #e67e22;
-}
-
-.delete-btn {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.delete-btn:hover {
-  background-color: #c0392b;
 }
 
 .loading, .error {
@@ -186,7 +177,7 @@
     gap: 8px;
   }
   
-  .view-applicants-btn, .edit-btn, .delete-btn {
+  .view-applicants-btn, .edit-btn {
     width: 100%;
   }
 }

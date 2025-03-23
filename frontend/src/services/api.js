@@ -396,22 +396,6 @@ export const postJob = async (jobData) => {
   }
 };
 
-export const deleteJob = async (jobId) => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    throw new Error("Authentication required");
-  }
-  try {
-    const response = await api.delete(`/jobs/${jobId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error deleting job:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
 export const fetchJobDetails = async (jobId) => {
   const token = localStorage.getItem("token");
   try {
