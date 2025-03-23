@@ -26,8 +26,8 @@ app.include_router(recruiters.router, prefix="/api", tags=["Recruiters"])
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # React app origin
+    allow_origins=["https://job-recommendation-frontend.vercel.app", "http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers (e.g., Content-Type)
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
