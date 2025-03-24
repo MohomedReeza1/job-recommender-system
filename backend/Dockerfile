@@ -15,5 +15,5 @@ RUN mkdir -p uploads
 # Set environment variables
 ENV PORT=8000
 
-# Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "${PORT}"]
+# Fix: Use shell form of CMD to ensure environment variable substitution
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
