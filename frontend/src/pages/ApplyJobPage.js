@@ -239,25 +239,20 @@ const ApplyJobPage = () => {
         throw new Error("You must be logged in to apply for jobs");
       }
       
-      // Create a FormData object
-      const formData = new FormData();
-      formData.append("job_id", jobId);
-      formData.append("cv", cvFile);
-      
-      if (coverLetterFile) {
-        formData.append("cover_letter", coverLetterFile);
-      }
-      
       // Make the API request
-      await axios.post(
-        "http://127.0.0.1:8000/api/apply-job/", 
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+      await applyForJob(formData)
+
+      // await axios.post("http://127.0.0.1:8000/api/apply-job/", formData, {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`
+      //   }
+      // }
+      // );
+      
+      // await applyForJob(formData);
+      // const response = await loginEmployer(formData.email, formData.password);
+      // const profile = await fetchJobSeekerProfile();
+      // const response = await fetchRecommendationsWithForm(formData);
       
       alert("Application submitted successfully!");
       navigate("/applied-jobs");
