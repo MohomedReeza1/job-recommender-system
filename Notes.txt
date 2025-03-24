@@ -2869,11 +2869,13 @@ reez@example.com - test123
 johndoe@example.com - test1234
 test@example.com - test123
 hazzam@example.com - test123
+user@example.com - test123
 
 2. RECRUITER
 user@alakeem.com - test123
 user@reema.com - test123
 johnwayne@example.com  - test123
+agency@example.com - test123
 
 ---------------------------------------------------------------------------------------
 USERS TABLE
@@ -3083,8 +3085,33 @@ git push -u origin main
 
 
 
+--------------------------------------------------------------------------------------
 
 
+
+DATABASE_URL: postgresql://postgres:CEJNvEBDXynTMoHOxrlokEVizwYgdoXI@postgres.railway.internal:5432/railway
+SECRET_KEY: e3f09c3b49d247a4b8c45643f8a9c91dcd872efb48c6e2b71d48d152f75f0e73
+PORT: 8000
+
+PART 2: DEPLOY DATABASE ON RAILWAY
+DATABASE_URL postgresql://postgres:oKrSsrtOhBJfpWIuBnOLzPWCdTBNIhih@postgres.railway.internal:5432/railway
+
+PART 3: DEPLOY BACKEND ON RAILWAY
+https://job-recommendation-backend-production.up.railway.app
+
+PART 4: DEPLOY FRONTEND ON VERCEL
+https://job-recommendation-frontend.vercel.app
+
+
+
+modified ApplyJobPage.js for Job Apply error
+
+ApplyJobPage.js, EmployerLogin.js & api.js
+
+modified the AppliedJobsPage.js, ViewApplicants.js & api.js for file upload issue
+
+
+--------------------------------------------------------------------------------------
 
 
 
