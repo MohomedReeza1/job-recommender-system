@@ -239,14 +239,7 @@ const ApplyJobPage = () => {
       }
       
       // Make the API request
-      await applyForJob(formData)
-
-      // await axios.post("http://127.0.0.1:8000/api/apply-job/", formData, {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`
-      //   }
-      // }
-      // );
+      await applyForJob(jobId, cvFile, coverLetterFile);
       
       alert("Application submitted successfully!");
       navigate("/applied-jobs");
