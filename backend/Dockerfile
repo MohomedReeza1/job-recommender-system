@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create uploads directory
-RUN mkdir -p uploads
+RUN mkdir -p /app/uploads && chmod 777 /app/uploads
 
 # Set environment variables
 ENV PORT=8000
