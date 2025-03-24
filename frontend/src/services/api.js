@@ -284,41 +284,6 @@ export const updateJobSeekerProfile = async (profileData) => {
   }
 };
 
-// Function to handle applying for a job
-// export const applyForJob = async (jobId, cvFile, coverLetterFile) => {
-//   const token = localStorage.getItem("token");
-  
-//   if (!token) {
-//     throw new Error("Authentication required");
-//   }
-  
-//   // Create form data
-//   const formData = new FormData();
-//   formData.append("job_id", jobId);
-//   formData.append("cv", cvFile);
-  
-//   if (coverLetterFile) {
-//     formData.append("cover_letter", coverLetterFile);
-//   }
-  
-//   try {
-//     const response = await axios.post(
-//       `${API_BASE_URL}/apply-job/`,
-//       formData,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//           'Content-Type': 'multipart/form-data'
-//         }
-//       }
-//     );
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error applying for job:", error);
-//     throw error;
-//   }
-// };
-
 
 // Function to handle applying for a job
 export const applyForJob = async (jobId, cvFile, coverLetterFile) => {
