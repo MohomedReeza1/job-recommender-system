@@ -440,3 +440,14 @@ export const updateJob = async (jobId, jobData) => {
     throw error;
   }
 };
+
+
+export const getUploadsBaseUrl = () => {
+  // In production, use the deployed backend URL without the '/api' suffix
+  if (process.env.NODE_ENV === 'production') {
+    const apiUrl = process.env.REACT_APP_API_BASE_URL || '';
+    return apiUrl.replace(/\/api$/, '');
+  }
+  // In development, use localhost
+  return 'http://localhost:8000';
+};

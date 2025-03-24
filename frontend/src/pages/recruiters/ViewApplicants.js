@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchJobDetails, fetchJobApplicants } from "../../services/api";
+import { fetchJobDetails, fetchJobApplicants, getUploadsBaseUrl } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "../../styles/ViewApplicants.css";
 
@@ -66,7 +66,7 @@ const ViewApplicants = () => {
 
   const handleViewDocument = (filename) => {
     if (filename) {
-      window.open(`http://localhost:8000/uploads/${filename}`, '_blank');
+      window.open(`${getUploadsBaseUrl()}/uploads/${filename}`, '_blank');
     }
   };
 

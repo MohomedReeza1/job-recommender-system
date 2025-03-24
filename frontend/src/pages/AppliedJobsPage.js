@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchAppliedJobs } from "../services/api";
+import { fetchAppliedJobs, getUploadsBaseUrl } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import '../styles/AppliedJobsPage.css';
 import { Link } from "react-router-dom";
@@ -71,33 +71,33 @@ const AppliedJobsPage = () => {
               <p><strong>Applied on:</strong> {new Date(job.applied_at).toLocaleDateString()}</p>
               
               <div className="application-documents">
-                {job.cv_filename && (
-                  <a 
-                    href={`http://localhost:8000/uploads/${job.cv_filename}`} 
-                    download={job.cv_filename.split('_').slice(1).join('_')} 
-                    className="download-link"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.open(`http://localhost:8000/uploads/${job.cv_filename}`, '_blank');
-                    }}
-                  >
-                    View CV
-                  </a>
-                )}
-                
-                {job.cover_letter_filename && (
-                  <a 
-                    href={`http://localhost:8000/uploads/${job.cover_letter_filename}`}
-                    download={job.cover_letter_filename.split('_').slice(1).join('_')}
-                    className="download-link"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.open(`http://localhost:8000/uploads/${job.cover_letter_filename}`, '_blank');
-                    }}
-                  >
-                    View Cover Letter
-                  </a>
-                )}
+              {job.cv_filename && (
+                <a 
+                  href={`${getUploadsBaseUrl()}/uploads/${job.cv_filename}`} 
+                  download={job.cv_filename.split('_').slice(1).join('_')} 
+                  className="download-link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.open(`${getUploadsBaseUrl()}/uploads/${job.cv_filename}`, '_blank');
+                  }}
+                >
+                  View CV
+                </a>
+              )}
+
+              {job.cover_letter_filename && (
+                <a 
+                  href={`${getUploadsBaseUrl()}/uploads/${job.cover_letter_filename}`}
+                  download={job.cover_letter_filename.split('_').slice(1).join('_')}
+                  className="download-link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.open(`${getUploadsBaseUrl()}/uploads/${job.cover_letter_filename}`, '_blank');
+                  }}
+                >
+                  View Cover Letter
+                </a>
+              )}
               </div>
             </div>
           </div>
