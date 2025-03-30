@@ -9,6 +9,7 @@ from routers.auth import get_current_user
 router = APIRouter()
 
 @router.get("/jobs/", response_model=list[JobResponse])
+@cache(expire=300) # Cache for 5 minutes
 def get_jobs(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     jobs = db.query(Job).offset(skip).limit(limit).all()
     return jobs
