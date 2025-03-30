@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-// import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { loginEmployer } from "../services/api";
 import "../styles/EmployerLogin.css";
 
 const EmployerLogin = () => {
   const { login } = useAuth();
-  // const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -40,9 +38,9 @@ const EmployerLogin = () => {
         return;
       }
       
-      // Create a properly formatted user data object for the login context
+      // User data object for the login context
       const userData = {
-        token: response.access_token,  // Make sure token is mapped correctly
+        token: response.access_token,
         role: response.role,
         user_id: response.user_id,
         specific_id: response.specific_id
@@ -50,7 +48,7 @@ const EmployerLogin = () => {
       
       console.log("Formatted login data being passed to AuthContext:", userData);
       
-      // Log the user in (this will handle storing the token and redirecting)
+      // Log the user in
       await login(userData);
       
     } catch (error) {

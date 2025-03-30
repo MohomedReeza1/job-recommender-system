@@ -23,11 +23,8 @@ const JobSeekerLogin = () => {
     setError(null);
     
     try {
-        // Use the API function instead of direct API call
+        // Use the API function to log in as a Job Seeker
         const response = await loginJobSeeker(formData.email, formData.password);
-
-        // Log the full response for debugging
-        console.log("Login data received:", response);
 
         // Extract user details
         const userData = {

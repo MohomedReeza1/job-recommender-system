@@ -212,7 +212,7 @@ def create_job_seeker(seeker: JobSeekerCreate, db: Session = Depends(get_db)):
         db.refresh(existing_seeker)
         return existing_seeker
     else:
-        # Create new profile (fallback - should already exist from registration)
+        # Create new profile
         new_seeker = JobSeeker(user_id=seeker.user_id, **seeker.dict(exclude={"user_id"}))
         db.add(new_seeker)
         db.commit()
