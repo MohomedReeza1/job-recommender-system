@@ -8,9 +8,6 @@ from routers.auth import get_current_user
 
 router = APIRouter()
 
-# IMPORTANT: More specific routes must be defined BEFORE parameter-based routes
-# to avoid conflicts in route resolution
-
 @router.get("/recruiters/my-posted-jobs", response_model=list[JobResponse])
 def get_my_posted_jobs(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
@@ -61,7 +58,6 @@ def get_agency_id_for_user(db: Session = Depends(get_db), current_user: User = D
     
     return {"agency_id": agency.agency_id}
 
-# Now define parameter-based routes AFTER the specific routes
 @router.get("/recruiters/{agency_id}", response_model=RecruitmentAgencyResponse)
 def get_agency_profile(agency_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
@@ -119,7 +115,7 @@ def get_job_applicants(job_id: int, db: Session = Depends(get_db), current_user:
                 "job_id": application.job_id,
                 "seeker_id": seeker.seeker_id,
                 "name": seeker.name,
-                "email": email,  # Include email from User table
+                "email": email,
                 "skills": seeker.skills,
                 "experience": seeker.previous_jobs,
                 "education": seeker.education,

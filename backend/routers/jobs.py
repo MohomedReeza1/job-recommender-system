@@ -28,7 +28,6 @@ def post_job(job: JobCreate, db: Session = Depends(get_db), current_user: User =
     if not agency:
         raise HTTPException(status_code=404, detail="Recruiter agency profile not found")
     
-    # IMPORTANT: Use agency_id as this matches the column name in the database model
     job_data = job.dict()
     job_data["agency_id"] = agency.agency_id
     
@@ -37,30 +36,6 @@ def post_job(job: JobCreate, db: Session = Depends(get_db), current_user: User =
     db.commit()
     db.refresh(new_job)
     return new_job
-
-@router.delete("/jobs/{job_id}", dependencies=[Depends(require_role("recruiter"))])
-def delete_job(job_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    """
-    Deletes a job posting if the authenticated recruiter is the owner.
-    """
-    job = db.query(Job).filter(Job.job_id == job_id).first()
-    if not job:
-        raise HTTPException(status_code=404, detail="Job not found")
-    
-    # Get the agency_id for the current user
-    agency = db.query(RecruitmentAgency).filter(RecruitmentAgency.user_id == current_user.user_id).first()
-    if not agency:
-        raise HTTPException(status_code=404, detail="Recruiter agency profile not found")
-    
-    # Check if the current recruiter owns this job
-    if job.agency_id != agency.agency_id:
-        raise HTTPException(status_code=403, detail="You don't have permission to delete this job")
-    
-    # Delete the job
-    db.delete(job)
-    db.commit()
-    
-    return {"message": "Job deleted successfully"}
 
 @router.put("/jobs/{job_id}", response_model=JobResponse, dependencies=[Depends(require_role("recruiter"))])
 def update_job(job_id: int, job_data: JobBase, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

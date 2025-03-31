@@ -23,7 +23,7 @@ const Footer = () => {
             <div className="footer-contact">
                 <h4>Contact Us</h4>
                 <p>Email: support@globalhire.com</p>
-                <p>Phone: +1 555-123-4567</p>
+                <p>Phone: 0112345678</p>
             </div>
             <div className="footer-newsletter">
                 <h4>Newsletter</h4>

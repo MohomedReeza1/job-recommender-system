@@ -75,7 +75,6 @@ async def apply_job(
         db.commit()
         db.refresh(new_application)
         
-        # Return a structure that matches AppliedJobResponse
         return {
             "application_id": new_application.application_id,
             "job_id": job_id,

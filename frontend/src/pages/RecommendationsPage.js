@@ -5,20 +5,20 @@ import "../styles/RecommendationsPage.css";
 
 const RecommendationsPage = () => {
   const [formData, setFormData] = useState({
-    name: "Test",
-    age: "20",
-    gender: "Male",
-    height: "150",
-    weight: "50",
-    marital_status: "Single",
+    name: "",
+    age: "",
+    gender: 0,
+    height: 0,
+    weight: 0,
+    marital_status: "",
     num_of_children: 0,
-    education: "Degree",
+    education: "",
     skills: "",
     interests: "",
     previous_jobs: "",
     looking_jobs: "",
-    description: "Description",
-    passport_status: "Valid",
+    description: "",
+    passport_status: "",
   });
 
   const [recommendedJobs, setRecommendedJobs] = useState([]);
@@ -42,20 +42,20 @@ const RecommendationsPage = () => {
 
   const handleResetForm = () => {
     setFormData({
-      name: "Test",
-      age: "20",
-      gender: "Male",
-      height: "150",
-      weight: "50",
-      marital_status: "Single",
+      name: "",
+      age: 0,
+      gender: "",
+      height: 0,
+      weight: 0,
+      marital_status: "",
       num_of_children: 0,
-      education: "Degree",
+      education: "",
       skills: "",
       interests: "",
       previous_jobs: "",
       looking_jobs: "",
-      description: "Description",
-      passport_status: "Valid",
+      description: "",
+      passport_status: "",
     });
     setRecommendedJobs([]);
     setShowRecommendations(false);
